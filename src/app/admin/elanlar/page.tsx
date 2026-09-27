@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import AdminListingRow from "./row";
+import AdminListingRow from "./Row";
 
 export const dynamic = "force-dynamic";
 
