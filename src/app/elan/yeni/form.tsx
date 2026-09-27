@@ -41,7 +41,9 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
       categoryId: finalCategoryId || null,
       type,
       condition,
-      auctionEnd: type === "AUCTION" ? fd.get("auctionEnd") : null,
+      auctionEnd: type === "AUCTION" && fd.get("auctionEnd")
+  ? new Date(fd.get("auctionEnd") as string).toISOString()
+  : null,
       images,
     };
     const res = await fetch("/api/listings", {

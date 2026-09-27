@@ -1,9 +1,14 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { randomUUID } from "crypto";
-import sharp from "sharp";
+import ImageKit from "imagekit";
+
+const imagekit = new ImageKit({
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
+});
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
@@ -13,36 +18,26 @@ export async function POST(req: Request) {
   const files = fd.getAll("files") as File[];
   if (!files.length) return NextResponse.json({ error: "Fayl seçilməyib" }, { status: 400 });
 
-  const dir = join(process.cwd(), "public", "uploads");
-  await mkdir(dir, { recursive: true });
-
   const urls: string[] = [];
 
   for (const file of files) {
     if (!file.type.startsWith("image/")) continue;
-    if (file.size > 10 * 1024 * 1024) continue;
+    if (file.size > 25 * 1024 * 1024) continue;
 
     const buf = Buffer.from(await file.arrayBuffer());
 
-    // 🎯 Şəkli optimallaşdır + resize et
-    // Max 1200x1200, WebP format, keyfiyyət 85
-    const optimized = await sharp(buf)
-      .resize({
-        width: 1200,
-        height: 1200,
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .webp({ quality: 85 })
-      .toBuffer();
+    const result = await imagekit.upload({
+      file: buf,
+      fileName: `listing_${Date.now()}_${Math.random().toString(36).slice(2)}.webp`,
+      folder: "/listings",
+      useUniqueFileName: true,
+    });
 
-    const name = randomUUID() + ".webp";
-    await writeFile(join(dir, name), optimized);
-    urls.push("/uploads/" + name);
+    urls.push(result.url);
   }
 
   if (!urls.length)
-    return NextResponse.json({ error: "Şəkil yüklənmədi (max 10MB, JPG/PNG/WebP)" }, { status: 400 });
+    return NextResponse.json({ error: "Şəkil yüklənmədi (max 25MB)" }, { status: 400 });
 
   return NextResponse.json({ urls });
 }
