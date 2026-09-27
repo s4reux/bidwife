@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import AdminUserRow from "./Row";
-
+import AdminUserRow from "./AdminRow";
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsers() {
