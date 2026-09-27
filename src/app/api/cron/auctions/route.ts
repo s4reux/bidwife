@@ -1,12 +1,34 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const authHeader = req.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (cronSecret && process.env.NODE_ENV === "production") {
+    const userAgent = req.headers.get("user-agent") || "";
+    if (!userAgent.includes("vercel-cron")) {
+      return NextResponse.json({ error: "İcazə yoxdur" }, { status: 401 });
+    }
+  }
+
   const now = new Date();
   const ended = await prisma.listing.findMany({
-    where: { type: "AUCTION", status: "ACTIVE", auctionEnd: { lt: now } },
-    include: { bids: { orderBy: { amount: "desc" }, take: 1, include: { user: true } } },
+    where: {
+      type: "AUCTION",
+      status: "ACTIVE",
+      auctionEnd: { lt: now },
+    },
+    include: {
+      bids: {
+        orderBy: { amount: "desc" },
+        take: 1,
+        include: { user: true },
+      },
+    },
   });
 
   for (const l of ended) {
@@ -15,26 +37,32 @@ export async function GET() {
 
     await prisma.listing.update({
       where: { id: l.id },
-      data: { status: winner ? "SOLD" : "ENDED", winnerId: winner?.id ?? null },
+      data: {
+        status: winner ? "SOLD" : "ENDED",
+        winnerId: winner?.id ?? null,
+      },
     });
 
     if (winner) {
       await notify(
         winner.id,
         "AUCTION_WON",
-        "🎉 Auksionu qazandin!",
-        l.title + " — " + Number(amount).toFixed(2) + " AZN",
+        "🎉 Auksionu qazandın!",
+        l.title + " — " + Number(amount).toFixed(2) + " ₼",
         "/elan/" + l.id
       );
     }
+
     await notify(
       l.sellerId,
       "AUCTION_ENDED",
       "Auksion bitdi",
-      winner ? l.title + " — qalib: " + winner.name : l.title + " — teklif olmadi",
+      winner
+        ? l.title + " — qalib: " + winner.name
+        : l.title + " — təklif olmadı",
       "/elan/" + l.id
     );
   }
 
-  return NextResponse.json({ processed: ended.length });
+  return NextResponse.json({ processed: ended.length, timestamp: now });
 }
