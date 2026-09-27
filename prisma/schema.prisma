@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  password      String
+  phone         String?
+  isAdmin       Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  listings      Listing[]
+  bids          Bid[]
+  notifications Notification[]
+  sentMessages  Message[]      @relation("SentMessages")
+  convA         Conversation[] @relation("ConvA")
+  convB         Conversation[] @relation("ConvB")
+  passwordResets PasswordReset[]
+}
+
+enum ListingType {
+  FIXED
+  AUCTION
+}
+
+enum ListingStatus {
+  ACTIVE
+  ENDED
+  SOLD
+}
+
+enum Condition {
+  NEW
+  LIKE_NEW
+  USED
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  slug     String     @unique
+  emoji    String     @default("📦")
+  parentId String?
+  parent   Category?  @relation("CatChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children Category[] @relation("CatChildren")
+  listings Listing[]
+  vipMinPrice Decimal @default(1) @db.Decimal(12, 2)
+
+  @@index([parentId])
+}
+model Listing {
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  price         Decimal        @db.Decimal(12, 2)
+  type          ListingType    @default(FIXED)
+  status        ListingStatus  @default(ACTIVE)
+  condition     Condition      @default(USED)
+  city          String?
+  images        String[]
+  auctionEnd    DateTime?
+  winnerId      String?
+  createdAt     DateTime       @default(now())
+  sellerId      String
+  seller        User           @relation(fields: [sellerId], references: [id])
+  categoryId    String?
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  bids          Bid[]
+  conversations Conversation[]
+
+  @@index([type, status])
+  @@index([categoryId])
+  @@index([city])
+    vipUntil DateTime?
+  vipPaid  Decimal?  @db.Decimal(12, 2)
+  @@index([condition])
+    @@index([vipUntil])
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  amount    Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([listingId, amount])
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  listingId String?
+  listing   Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  userAId   String
+  userA     User      @relation("ConvA", fields: [userAId], references: [id])
+  userBId   String
+  userB     User      @relation("ConvB", fields: [userBId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userAId, userBId, listingId])
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
