@@ -15,26 +15,47 @@ export default async function Home({
 }) {
   const now = new Date();
 
-  const where: any = {
-    OR: [
-      { type: "FIXED", status: "ACTIVE" },
-      { type: "AUCTION", status: "ACTIVE", auctionEnd: { gt: now } },
-    ],
+  // 🔑 ƏSAS FİLTR
+  let where: any = {
+    status: { in: ["ACTIVE", "SOLD"] },
   };
 
-  if (searchParams.type === "AUCTION") where.OR = [{ type: "AUCTION", status: "ACTIVE", auctionEnd: { gt: now } }];
-  if (searchParams.type === "FIXED") where.OR = [{ type: "FIXED", status: "ACTIVE" }];
-  if (searchParams.q) {
-    where.AND = [{
-      OR: [
-        { title: { contains: searchParams.q, mode: "insensitive" } },
-        { description: { contains: searchParams.q, mode: "insensitive" } },
-      ],
-    }];
+  // Növ filtri
+  if (searchParams.type === "AUCTION") {
+    where.type = "AUCTION";
+    where.status = "ACTIVE";
+    where.auctionEnd = { gt: now };
+  } else if (searchParams.type === "FIXED") {
+    where.type = "FIXED";
+    where.status = "ACTIVE";
+  } else {
+    // Hamısı — auksionlar yalnız aktiv, sabitlər aktiv+sold
+    where.OR = [
+      { type: "FIXED", status: "ACTIVE" },
+      { type: "AUCTION", status: "ACTIVE", auctionEnd: { gt: now } },
+    ];
+    delete where.status;
   }
+
+  // Axtarış
+  if (searchParams.q) {
+    where.AND = [
+      ...(where.AND || []),
+      {
+        OR: [
+          { title: { contains: searchParams.q, mode: "insensitive" } },
+          { description: { contains: searchParams.q, mode: "insensitive" } },
+        ],
+      },
+    ];
+  }
+
+  // Kateqoriya
   if (searchParams.cat) where.category = { slug: searchParams.cat };
   if (searchParams.city) where.city = searchParams.city;
   if (searchParams.condition) where.condition = searchParams.condition;
+
+  // Qiymət
   if (searchParams.minPrice || searchParams.maxPrice) {
     where.price = {};
     if (searchParams.minPrice) where.price.gte = Number(searchParams.minPrice);
@@ -44,6 +65,7 @@ export default async function Home({
   const select = {
     id: true, title: true, price: true, type: true, status: true,
     city: true, images: true, auctionEnd: true, condition: true, vipUntil: true,
+    createdAt: true,
     category: { select: { id: true, name: true, slug: true } },
     bids: { orderBy: { amount: "desc" } as const, take: 1, select: { amount: true } },
   };
@@ -56,7 +78,13 @@ export default async function Home({
       select,
     }),
     prisma.listing.findMany({
-      where: { ...where, OR: [{ vipUntil: null }, { vipUntil: { lte: now } }] },
+      where: {
+        ...where,
+        OR: [
+          { vipUntil: null },
+          { vipUntil: { lte: now } },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       take: 60,
       select,
@@ -82,11 +110,11 @@ export default async function Home({
     <div className="animate-in">
       {!isSearching && (
         <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
             <span className="gradient-text">Al, sat, auksion</span> et
           </h1>
           <p className="text-gray-500 text-sm md:text-base">
-            Azərbaycanın müasir onlayn bazarı — minlərlə elan bir yerdə
+            Azərbaycanın müasir onlayn bazarı
           </p>
         </div>
       )}
@@ -97,7 +125,8 @@ export default async function Home({
         <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide">
           <Link href="/" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-gray-900 text-white">Hamısı</Link>
           <Link href="/?type=AUCTION" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border hover:border-orange-500 transition-all">🔴 Auksionlar</Link>
-          {categories.slice(0, 10).map((c) => (
+          <Link href="/?type=FIXED" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border hover:border-orange-500 transition-all">💰 Sabit qiymət</Link>
+          {categories.slice(0, 8).map((c) => (
             <Link key={c.id} href={`/?cat=${c.slug}`}
               className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border hover:border-orange-500 transition-all">
               {c.emoji} {c.name}

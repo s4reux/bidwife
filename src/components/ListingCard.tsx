@@ -3,6 +3,27 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+function useTimeAgo(date: string) {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    const update = () => {
+      const diff = Date.now() - new Date(date).getTime();
+      const m = Math.floor(diff / 60000);
+      const h = Math.floor(m / 60);
+      const d = Math.floor(h / 24);
+      if (m < 1) setText("indi");
+      else if (m < 60) setText(`${m} dəq əvvəl`);
+      else if (h < 24) setText(`${h} saat əvvəl`);
+      else if (d < 30) setText(`${d} gün əvvəl`);
+      else setText(new Date(date).toLocaleDateString("az-AZ"));
+    };
+    update();
+    const t = setInterval(update, 60000);
+    return () => clearInterval(t);
+  }, [date]);
+  return text;
+}
+
 function useCountdown(end?: string | null) {
   const [text, setText] = useState("");
   const [urgent, setUrgent] = useState(false);
@@ -27,89 +48,119 @@ function useCountdown(end?: string | null) {
   return { text, urgent };
 }
 
-const CONDITION_LABEL: Record<string, string> = { NEW: "Yeni", LIKE_NEW: "Yeni kimi", USED: "İşlənmiş" };
-
 export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
-  const price = Number(l.price).toFixed(2);
-  const topBid = l.bids?.[0]?.amount ? Number(l.bids[0].amount).toFixed(2) : null;
+  const price = Number(l.price).toLocaleString("az-AZ", { maximumFractionDigits: 0 });
+  const topBid = l.bids?.[0]?.amount ? Number(l.bids[0].amount).toLocaleString("az-AZ", { maximumFractionDigits: 0 }) : null;
   const ended = l.auctionEnd ? new Date(l.auctionEnd) < new Date() : false;
-  const { text: countdown, urgent } = useCountdown(l.type === "AUCTION" && !ended ? l.auctionEnd : null);
+  const { text: countdown, urgent } = useCountdown(
+    l.type === "AUCTION" && !ended ? l.auctionEnd : null
+  );
+  const timeAgo = useTimeAgo(l.createdAt);
   const isVip = l.vipUntil && new Date(l.vipUntil) > new Date();
+  const imageCount = l.images?.length || 0;
 
-  const inner = (
-    <Link href={`/elan/${l.id}`} className="group block h-full">
-      <div className="bg-white rounded-2xl overflow-hidden flex flex-col h-full border border-gray-100 card-hover">
-        <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden relative">
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(idx * 0.03, 0.3) }}
+    >
+      <Link
+        href={`/elan/${l.id}`}
+        className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 h-full"
+      >
+        {/* Şəkil */}
+        <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
           {l.images?.[0] ? (
-            <img src={l.images[0]} alt={l.title} loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+            <img
+              src={l.images[0]}
+              alt={l.title}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           ) : (
             <div className="w-full h-full grid place-items-center text-gray-300 text-5xl">📦</div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-          {l.type === "AUCTION" && (
-            <div className={`absolute top-2.5 left-2.5 text-[11px] px-2.5 py-1 rounded-full font-bold backdrop-blur-sm ${
+          {/* Ürək ikonu - sağ üst */}
+          <button
+            onClick={(e) => { e.preventDefault(); }}
+            className="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-white/90 backdrop-blur grid place-items-center hover:bg-white transition-colors shadow-sm"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+
+          {/* Şəkil sayı - sol alt */}
+          {imageCount > 1 && (
+            <div className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+              </svg>
+              {imageCount}
+            </div>
+          )}
+
+          {/* VIP badge - sağ alt */}
+          {isVip && (
+            <div className="absolute bottom-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
+              👑 VIP
+            </div>
+          )}
+
+          {/* Auksion badge - sol üst */}
+          {l.type === "AUCTION" && !isVip && (
+            <div className={`absolute top-2.5 left-2.5 text-[10px] px-2.5 py-1 rounded-full font-bold ${
               ended ? "bg-gray-900/80 text-white" : "bg-red-500/90 text-white animate-pulse"
             }`}>
               {ended ? "Bitdi" : "🔴 AUKSION"}
             </div>
           )}
-
-                  {l.condition && l.condition !== "USED" && !isVip && (
-            <div className="absolute top-2.5 right-2.5 bg-green-500/90 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-full font-bold">
-              {CONDITION_LABEL[l.condition]}
-            </div>
-          )}
-
-          {isVip && (
-            <div className="absolute top-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
-              👑 VIP
-            </div>
-          )}
         </div>
 
-        <div className="p-3.5 flex-1 flex flex-col">
-          <div className="font-semibold text-[13.5px] leading-snug line-clamp-2 group-hover:text-orange-600 transition-colors min-h-[2.5rem]">
+        {/* Məlumat */}
+        <div className="p-3.5">
+          {/* Qiymət */}
+          <div className="flex items-baseline gap-1 mb-1.5">
+            <span className="text-lg font-black text-gray-900">
+              {topBid ?? price}
+            </span>
+            <span className="text-base font-bold text-gray-700">₼</span>
+          </div>
+
+          {/* Başlıq */}
+          <h3 className="text-[14px] font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 min-h-[2.4rem]">
             {l.title}
-          </div>
-          <div className="text-[11px] text-gray-400 mt-1.5 flex items-center gap-1">
-            <span>📍</span> {l.city || "—"}
-          </div>
+          </h3>
 
-          <div className="mt-auto pt-3 flex items-end justify-between gap-2">
-            <div className="min-w-0">
-              <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">
-                {topBid ? "Ən yüksək" : "Qiymət"}
-              </div>
-              <div className="text-orange-600 font-black text-lg leading-tight truncate">
-                {topBid ?? price} <span className="text-sm">₼</span>
-              </div>
+          {/* Meta (kateqoriya + əlavə) */}
+          {(l.category || l.condition) && (
+            <div className="text-xs text-gray-500 mb-2 line-clamp-1">
+              {[
+                l.category?.name,
+                l.condition === "NEW" && "Yeni",
+                l.condition === "LIKE_NEW" && "Yeni kimi",
+              ].filter(Boolean).join(" • ")}
             </div>
-            {l.type === "AUCTION" && !ended && countdown && (
-              <div className={`text-[10.5px] font-bold px-2 py-1 rounded-lg whitespace-nowrap ${
-                urgent ? "bg-red-600 text-white animate-pulse" : "bg-red-50 text-red-600 border border-red-100"
-              }`}>
-                ⏱ {countdown}
-              </div>
-            )}
-            {l.type === "AUCTION" && ended && (
-              <div className="text-[10.5px] font-bold px-2 py-1 rounded-lg bg-gray-100 text-gray-500">Bitdi</div>
-            )}
+          )}
+
+          {/* Auksion sayacı */}
+          {l.type === "AUCTION" && !ended && countdown && (
+            <div className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-md mb-2 ${
+              urgent ? "bg-red-600 text-white animate-pulse" : "bg-red-50 text-red-600"
+            }`}>
+              ⏱ {countdown}
+            </div>
+          )}
+
+          {/* Şəhər + vaxt */}
+          <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
+            <span className="truncate">📍 {l.city || "—"}</span>
+            <span className="whitespace-nowrap">{timeAgo}</span>
           </div>
         </div>
-      </div>
-    </Link>
-  );
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-      className="relative"
-    >
-           {inner}
+      </Link>
     </motion.div>
   );
 }

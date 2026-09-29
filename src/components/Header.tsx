@@ -20,10 +20,10 @@ export default async function Header() {
     <header className="sticky top-0 z-30 glass border-b border-gray-200/50">
       <div className="max-w-6xl mx-auto flex items-center gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-xl gradient-text bg-gradient-to-br from-orange-500 to-red-600 grid place-items-center text-white font-black text-lg group-hover:scale-110 transition-transform">
-            B
-          </div>
-          <span className="font-black text-xl gradient-text hidden sm:inline">Bazar</span>
+          <span className="font-black text-2xl group-hover:scale-105 transition-transform">
+            <span className="text-orange-600">Bid</span>
+            <span className="text-gray-900">Wife</span>
+          </span>
         </Link>
 
         <nav className="hidden md:flex gap-1 text-sm">
@@ -52,11 +52,6 @@ export default async function Header() {
                 )}
               </Link>
               <NotificationBell />
-              {user.isAdmin && (
-  <Link href="/admin" className="hidden md:flex p-2.5 hover:bg-gray-100 rounded-xl transition-colors" title="Admin">
-    <span className="text-lg">⚙️</span>
-  </Link>
-)}
               <Link href="/kabinet" className="hidden sm:flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 rounded-xl transition-colors">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold text-sm">
                   {user.name[0].toUpperCase()}
