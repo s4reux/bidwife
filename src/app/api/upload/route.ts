@@ -4,15 +4,32 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import ImageKit from "imagekit";
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
-});
-
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
+
+  // ⚠️ ENV yoxlaması
+  const publicKey = process.env.IMAGEKIT_PUBLIC_KEY;
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+  const urlEndpoint = process.env.IMAGEKIT_URL_ENDPOINT;
+
+  if (!publicKey || !privateKey || !urlEndpoint) {
+    console.error("ImageKit env vars missing:", {
+      hasPublic: !!publicKey,
+      hasPrivate: !!privateKey,
+      hasEndpoint: !!urlEndpoint,
+    });
+    return NextResponse.json({
+      error: "Server konfiqurasiyası səhvdir. Administratorla əlaqə saxla."
+    }, { status: 500 });
+  }
+
+  // 🔑 YALNIZ FUNKSIYA İÇİNDƏ initialize et
+  const imagekit = new ImageKit({
+    publicKey,
+    privateKey,
+    urlEndpoint,
+  });
 
   const fd = await req.formData();
   const files = fd.getAll("files") as File[];
