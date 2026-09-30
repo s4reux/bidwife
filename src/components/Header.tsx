@@ -51,6 +51,9 @@ export default async function Header() {
                   </span>
                 )}
               </Link>
+              <Link href="/favoriler" className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors" title="Favorilər">
+                <span className="text-lg">❤️</span>
+              </Link>
               <NotificationBell />
               <Link href="/kabinet" className="hidden sm:flex items-center gap-2 px-2 py-1.5 hover:bg-gray-100 rounded-xl transition-colors">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold text-sm">

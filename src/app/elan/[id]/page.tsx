@@ -152,9 +152,17 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 )}
 
                 {isWinner && (
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
-                    <div className="text-2xl">🏆</div>
-                    <div className="font-bold text-green-700 text-sm mt-1">Sən qazandın!</div>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4 mb-3 text-center">
+                    <div className="text-3xl">🏆</div>
+                    <div className="font-bold text-green-700 mt-1">Sən qazandın!</div>
+                    {listing.seller.phone && (
+                      <a
+                        href={`tel:${listing.seller.phone}`}
+                        className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2.5 rounded-xl font-bold hover:shadow-lg transition-all"
+                      >
+                        📞 {listing.seller.phone}
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -182,12 +190,12 @@ export default async function ListingPage({ params }: { params: { id: string } }
                   {Number(listing.price).toFixed(2)} ₼
                 </div>
 
-                {!isOwner && listing.seller.phone && me && (
+                            {!isOwner && listing.seller.phone && me && (
                   <a
                     href={`tel:${listing.seller.phone}`}
                     className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg hover:shadow-green-200 transition-all mb-2"
                   >
-                    📞 Nömrəni göstər
+                    📞 {listing.seller.phone}
                   </a>
                 )}
                 {!isOwner && me && (
@@ -216,13 +224,43 @@ export default async function ListingPage({ params }: { params: { id: string } }
               </div>
             </div>
 
-            {!isOwner && me && listing.seller.phone && (
-              <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
-                <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
-                <div className="font-bold text-green-800">{listing.seller.phone}</div>
-              </div>
+                     {!isOwner && me && listing.seller.phone && (
+              <>
+                {isAuction ? (
+                  isWinner ? (
+                    <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
+                      <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
+                      <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800 hover:underline">
+                        {listing.seller.phone}
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800">
+                      🔒 Əlaqə məlumatları yalnız auksion qalibinə göstərilir
+                    </div>
+                  )
+                ) : (
+                  <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
+                    <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
+                    <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800 hover:underline">
+                      {listing.seller.phone}
+                    </a>
+                  </div>
+                )}
+              </>
             )}
           </div>
+
+
+                          {!ended && !isOwner && (
+                  <BidBox listingId={listing.id} minBid={Number(topBid ?? listing.price)} loggedIn={!!me} />
+                )}
+
+                {!ended && !isOwner && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3 text-xs text-amber-800 leading-relaxed">
+                    ⚠️ <b>Diqqət:</b> Satıcının əlaqə məlumatları <b>yalnız auksionu qazanan</b> şəxslə paylaşılacaq. Təklif ver, qazan, sonra satıcı ilə əlaqə saxla.
+                  </div>
+                )}
 
           {isOwner && (
             <div className="bg-white rounded-2xl p-5 border border-gray-100 space-y-3">

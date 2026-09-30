@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
@@ -15,12 +17,31 @@ export async function GET() {
     prisma.notification.count({ where: { userId: user.id, readAt: null } }),
   ]);
 
-  return NextResponse.json({ items, unread });
+  // 🔑 AUCTION_WON bildirişləri üçün satıcı telefonunu əlavə et
+  const itemsWithPhone = await Promise.all(
+    items.map(async (n) => {
+      if (n.type === "AUCTION_WON" && n.link?.startsWith("/elan/")) {
+        try {
+          const listingId = n.link.replace("/elan/", "");
+          const listing = await prisma.listing.findUnique({
+            where: { id: listingId },
+            include: { seller: { select: { phone: true } } },
+          });
+          return { ...n, sellerPhone: listing?.seller.phone || null };
+        } catch {
+          return n;
+        }
+      }
+      return n;
+    })
+  );
+
+  return NextResponse.json({ items: itemsWithPhone, unread });
 }
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Giris teleb olunur" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Giriş tələb olunur" }, { status: 401 });
 
   const { ids, all } = await req.json();
   if (all) {

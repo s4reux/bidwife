@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 function useTimeAgo(date: string) {
   const [text, setText] = useState("");
@@ -49,6 +50,8 @@ function useCountdown(end?: string | null) {
 }
 
 export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
+  const [favorited, setFavorited] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
   const price = Number(l.price).toLocaleString("az-AZ", { maximumFractionDigits: 0 });
   const topBid = l.bids?.[0]?.amount ? Number(l.bids[0].amount).toLocaleString("az-AZ", { maximumFractionDigits: 0 }) : null;
   const ended = l.auctionEnd ? new Date(l.auctionEnd) < new Date() : false;
@@ -57,6 +60,38 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
   );
   const timeAgo = useTimeAgo(l.createdAt);
   const isVip = l.vipUntil && new Date(l.vipUntil) > new Date();
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ids?.includes(l.id)) setFavorited(true);
+      })
+      .catch(() => {});
+  }, [l.id]);
+
+  async function toggleFav(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setFavLoading(true);
+    const res = await fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listingId: l.id }),
+    });
+    setFavLoading(false);
+    if (!res.ok) {
+      const data = await res.json();
+      if (res.status === 401) {
+        toast.error("Favorilərə əlavə etmək üçün daxil ol");
+      } else {
+        toast.error(data.error || "Xəta");
+      }
+      return;
+    }
+    const data = await res.json();
+    setFavorited(data.favorited);
+    toast.success(data.favorited ? "❤️ Favorilərə əlavə edildi" : "Favorilərdən silindi");
+  }
   const imageCount = l.images?.length || 0;
 
   return (
@@ -83,11 +118,22 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
           )}
 
           {/* Ürək ikonu - sağ üst */}
-          <button
-            onClick={(e) => { e.preventDefault(); }}
-            className="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-white/90 backdrop-blur grid place-items-center hover:bg-white transition-colors shadow-sm"
+                   <button
+            onClick={toggleFav}
+            disabled={favLoading}
+            className={`absolute top-2.5 right-2.5 w-9 h-9 rounded-full backdrop-blur grid place-items-center hover:bg-white transition-all shadow-sm ${
+              favorited ? "bg-red-50" : "bg-white/90"
+            } disabled:opacity-50`}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill={favorited ? "#ef4444" : "none"}
+              stroke={favorited ? "#ef4444" : "currentColor"}
+              strokeWidth="2"
+              className={favorited ? "" : "text-gray-400"}
+            >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
           </button>
