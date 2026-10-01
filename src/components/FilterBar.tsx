@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { ALL_REGIONS_WITH_DIGER } from "@/lib/regions";
 
 type Category = { id: string; name: string; slug: string; emoji: string };
 
@@ -41,12 +42,6 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
     r.push("/?" + params.toString());
     setOpen(false);
   }
-
-  const CITIES = [
-    "Bakı", "Sumqayıt", "Gəncə", "Mingəçevir", "Şirvan",
-    "Naxçıvan", "Lənkəran", "Yevlax", "Şəki", "Xankəndi",
-    "Şuşa", "Quba", "Qusar", "Zaqatala", "Digər",
-  ];
 
   return (
     <>
@@ -102,10 +97,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-lg">Filtrlər</h3>
                 {activeCount > 0 && (
-                  <button
-                    onClick={clear}
-                    className="text-xs text-red-600 hover:underline"
-                  >
+                  <button onClick={clear} className="text-xs text-red-600 hover:underline">
                     Təmizlə
                   </button>
                 )}
@@ -129,7 +121,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
 
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">
-                  Şəhər
+                  Şəhər / Rayon
                 </label>
                 <select
                   value={city}
@@ -137,7 +129,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                   className="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
                 >
                   <option value="">Hamısı</option>
-                  {CITIES.map((c) => (
+                  {ALL_REGIONS_WITH_DIGER.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>

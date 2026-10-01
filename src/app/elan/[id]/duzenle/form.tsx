@@ -5,6 +5,7 @@ import ImageUploader from "@/components/ImageUploader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ALL_REGIONS_WITH_DIGER } from "@/lib/regions";
 
 type Cat = { id: string; name: string; emoji: string; parentId: string | null };
 
@@ -67,7 +68,7 @@ export default function EditForm({
     });
     setLoading(false);
     if (!res.ok) { toast.error((await res.json()).error); return; }
-    toast.success("Yenilendi!");
+    toast.success("Yeniləndi!");
     r.push(`/elan/${listing.id}`);
     r.refresh();
   }
@@ -79,23 +80,23 @@ export default function EditForm({
       className="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-5 max-w-2xl mx-auto"
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Elani redakte et</h1>
+        <h1 className="text-2xl font-bold">Elanı redaktə et</h1>
         <Link href={`/elan/${listing.id}`} className="text-sm text-gray-500 hover:text-orange-600">← Geri</Link>
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
-        ℹ️ Elan novu ({listing.type === "AUCTION" ? "Auksion" : "Sabit qiymet"}) deyisdirile bilmez
+        ℹ️ Elan növü ({listing.type === "AUCTION" ? "Auksion" : "Sabit qiymət"}) dəyişdirilə bilməz
       </div>
 
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1 block">Sekiller</label>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">Şəkillər</label>
         <ImageUploader value={images} onChange={setImages} />
       </div>
 
-      <input name="title" required defaultValue={listing.title} placeholder="Basliq"
+      <input name="title" required defaultValue={listing.title} placeholder="Başlıq"
         className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" />
 
-      <textarea name="description" required rows={4} defaultValue={listing.description} placeholder="Tesvir"
+      <textarea name="description" required rows={4} defaultValue={listing.description} placeholder="Təsvir"
         className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none resize-none" />
 
       <div className="grid grid-cols-2 gap-3">
@@ -103,15 +104,15 @@ export default function EditForm({
           className="border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none" />
         <select name="city" defaultValue={listing.city || ""}
           className="border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none bg-white">
-          <option value="">Seher sec</option>
-          {["Bakı","Sumqayıt","Gəncə","Mingəçevir","Şirvan","Naxçıvan","Lənkəran","Yevlax","Şəki","Xankəndi","Şuşa","Quba","Qusar","Zaqatala","Digər"].map((c) => (
+          <option value="">Şəhər / Rayon seç</option>
+          {ALL_REGIONS_WITH_DIGER.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
       </div>
 
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-1 block">Veziyyet</label>
+        <label className="text-sm font-medium text-gray-700 mb-1 block">Vəziyyət</label>
         <div className="grid grid-cols-3 gap-2">
           {[
             { v: "NEW", l: "🆕 Yeni" },
@@ -132,20 +133,20 @@ export default function EditForm({
         <label className="text-sm font-medium text-gray-700 block">Kateqoriya</label>
         <select value={parentId} onChange={(e) => { setParentId(e.target.value); setChildId(""); setGrandId(""); }}
           className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none bg-white">
-          <option value="">— Esas kateqoriya sec —</option>
+          <option value="">— Əsas kateqoriya seç —</option>
           {parents.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
         </select>
         {children.length > 0 && (
           <select value={childId} onChange={(e) => { setChildId(e.target.value); setGrandId(""); }}
             className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none bg-white">
-            <option value="">— Alt kateqoriya sec —</option>
+            <option value="">— Alt kateqoriya seç —</option>
             {children.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
           </select>
         )}
         {grandchildren.length > 0 && (
           <select value={grandId} onChange={(e) => setGrandId(e.target.value)}
             className="w-full border border-gray-200 p-3 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none bg-white">
-            <option value="">— Model sec —</option>
+            <option value="">— Model seç —</option>
             {grandchildren.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         )}
@@ -153,7 +154,7 @@ export default function EditForm({
 
       <motion.button whileTap={{ scale: 0.98 }} disabled={loading}
         className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl hover:shadow-lg font-bold disabled:opacity-50">
-        {loading ? "Yenilenir..." : "Yadda saxla"}
+        {loading ? "Yenilənir..." : "Yadda saxla"}
       </motion.button>
     </motion.form>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/ImageUploader";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { ALL_REGIONS_WITH_DIGER } from "@/lib/regions";
 
 type Cat = { id: string; name: string; emoji: string; parentId: string | null };
 
@@ -41,9 +42,10 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
       categoryId: finalCategoryId || null,
       type,
       condition,
-      auctionEnd: type === "AUCTION" && fd.get("auctionEnd")
-  ? new Date(fd.get("auctionEnd") as string).toISOString()
-  : null,
+      auctionEnd:
+        type === "AUCTION" && fd.get("auctionEnd")
+          ? new Date(fd.get("auctionEnd") as string).toISOString()
+          : null,
       images,
     };
     const res = await fetch("/api/listings", {
@@ -71,7 +73,6 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
     >
       <h1 className="text-2xl font-bold">Yeni elan</h1>
 
-      {/* Elan növü */}
       <div className="grid grid-cols-2 gap-3">
         {(["FIXED", "AUCTION"] as const).map((t) => (
           <button
@@ -93,25 +94,21 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
         ))}
       </div>
 
-      {/* Şəkillər */}
       <div>
         <label className="text-sm font-medium text-gray-700 mb-1 block">Şəkillər</label>
         <ImageUploader value={images} onChange={setImages} />
       </div>
 
-      {/* Başlıq */}
       <input
         name="title" required placeholder="Başlıq"
         className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
       />
 
-      {/* Təsvir */}
       <textarea
         name="description" required rows={4} placeholder="Təsvir"
         className="w-full border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none resize-none"
       />
 
-      {/* Qiymət + Şəhər */}
       <div className="grid grid-cols-2 gap-3">
         <input
           name="price" required type="number" step="0.01"
@@ -122,16 +119,13 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
           name="city"
           className="border border-gray-200 p-3 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
         >
-          <option value="">Şəhər seç</option>
-          {["Bakı", "Sumqayıt", "Gəncə", "Mingəçevir", "Şirvan",
-            "Naxçıvan", "Lənkəran", "Yevlax", "Şəki", "Xankəndi",
-            "Şuşa", "Quba", "Qusar", "Zaqatala", "Digər"].map((c) => (
+          <option value="">Şəhər / Rayon seç</option>
+          {ALL_REGIONS_WITH_DIGER.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
       </div>
 
-      {/* VƏZİYYƏT */}
       <div>
         <label className="text-sm font-medium text-gray-700 mb-1 block">Vəziyyət</label>
         <div className="grid grid-cols-3 gap-2">
@@ -156,7 +150,6 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
         </div>
       </div>
 
-      {/* KATEQORİYA (kaskad) */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700 block">Kateqoriya</label>
 
@@ -198,7 +191,6 @@ export default function NewListingForm({ categories }: { categories: Cat[] }) {
         )}
       </div>
 
-      {/* Auksion bitmə tarixi */}
       {type === "AUCTION" && (
         <div>
           <label className="text-sm font-medium text-gray-700 mb-1 block">
