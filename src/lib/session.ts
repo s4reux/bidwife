@@ -9,6 +9,13 @@ export async function getCurrentUser() {
   if (!payload) return null;
   return prisma.user.findUnique({
     where: { id: payload.uid },
-    select: { id: true, email: true, name: true, phone: true, isAdmin: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      phone: true,
+      isAdmin: true,
+      emailVerified: true,
+    },
   });
 }

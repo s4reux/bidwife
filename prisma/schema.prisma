@@ -23,6 +23,8 @@ model User {
   convB         Conversation[] @relation("ConvB")
   passwordResets PasswordReset[]
   favorites     Favorite[]
+  emailVerified    Boolean         @default(false)
+  verifyCodes      VerifyCode[]
 }
 
 enum ListingType {
@@ -165,4 +167,17 @@ model Favorite {
   @@unique([userId, listingId])
   @@index([userId])
   @@index([listingId])
+}
+
+model VerifyCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([code])
 }
