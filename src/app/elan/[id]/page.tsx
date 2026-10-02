@@ -96,22 +96,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
           <div className="p-4">
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
           </div>
-
           {/* AUKSION: Bid box burada görünür */}
           {isAuction && (
             <div className="px-4 pb-4 border-t pt-4">
-              <div className="text-xs text-gray-500 font-medium uppercase tracking-wide flex items-center gap-2 mb-1">
-                {ended ? "Auksion bitdi" : "Cari təklif"}
-                {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
-              </div>
-              <div className="text-3xl font-black text-orange-600 mb-3">{displayPrice} ₼</div>
-
-              {listing.auctionEnd && !ended && (
-                <div className="text-xs text-gray-500 mb-3">
-                  ⏱ Bitmə: {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
-                </div>
-              )}
-
               {isWinner && (
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
                   <div className="text-2xl">🏆</div>
@@ -201,13 +188,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-        {/* AUKSİON: Təkliflər siyahısı (bid box yuxarıda göründüyü üçün) */}
+             {/* AUKSİON: Cari təklif + Təkliflər siyahısı */}
         {isAuction && (
           <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
-            <h2 className="font-bold text-base mb-3 flex items-center gap-2">
-              Təkliflər
-              {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
-            </h2>
             <BidLive
               listingId={listing.id}
               initialBids={listing.bids.map((b) => ({
