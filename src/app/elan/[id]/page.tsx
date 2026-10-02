@@ -76,12 +76,10 @@ export default async function ListingPage({ params }: { params: { id: string } }
         <span className="text-gray-700 truncate">{listing.title}</span>
       </div>
 
-      {/* ============ MOBİL GÖRÜNÜŞ ============ */}
-      <div className="lg:hidden">
+          {/* ============ MOBİL GÖRÜNÜŞ ============ */}
+      <div className="lg:hidden -mx-4">
         {/* Şəkil — TAM EKRAN */}
-        <div className="-mx-4">
-          <Gallery images={listing.images} title={listing.title} fullBleed />
-        </div>
+        <Gallery images={listing.images} title={listing.title} fullBleed />
 
         {/* Başlıq + Meta + Qiymət — BİR KART */}
         <div className="mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
@@ -161,8 +159,8 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          {/* Meta (Şəhər / Kateqoriya / Vəziyyət) */}
-          <div className="border-t p-4 grid grid-cols-2 gap-4 text-sm">
+                   {/* Meta (Şəhər / Kateqoriya / Vəziyyət) */}
+          <div className="p-4 grid grid-cols-2 gap-4 text-sm">
             {listing.city && (
               <div>
                 <div className="text-xs text-gray-400 mb-0.5">Şəhər</div>
@@ -191,10 +189,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 </div>
               </div>
             )}
-          </div>
-
-          {/* Təsvir — AYNI KARTIN İÇİNDƏ */}
-          <div className="border-t p-4">
+          </div>         
+ {/* Təsvir — AYNI KARTIN İÇİNDƏ */}
+          <div className="px-4 pb-4">
             <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">
               Açıqlama
             </div>
@@ -512,7 +509,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      {/* MOBİL STICKY BOTTOM */}
+         {/* MOBİL STICKY BOTTOM */}
       {!isOwner && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-40 shadow-lg">
           <div className="flex gap-2">

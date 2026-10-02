@@ -13,14 +13,59 @@ export default function Gallery({
 }) {
   const [active, setActive] = useState(0);
 
+  // FULL-BLEED: edge-to-edge, kart yoxdur
+  if (fullBleed) {
+    if (!images.length) {
+      return (
+        <div className="w-full h-[350px] bg-gradient-to-br from-gray-50 to-gray-100 grid place-items-center text-gray-300 text-6xl">
+          📦
+        </div>
+      );
+    }
+    return (
+      <div className="w-full">
+        <div className="w-full h-[350px] md:h-[500px] bg-gray-50 overflow-hidden relative">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={active}
+              src={images[active]}
+              alt={title}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </AnimatePresence>
+
+          {images.length > 1 && (
+            <>
+              <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                {active + 1} / {images.length}
+              </div>
+              <div className="absolute bottom-3 left-3 flex gap-1.5 max-w-[60%] overflow-x-auto scrollbar-hide">
+                {images.slice(0, 5).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActive(i)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      i === active ? "bg-white w-6" : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // NORMAL (desktop)
   if (!images.length) {
     return (
-      <div className={fullBleed ? "" : "bg-white rounded-2xl p-3 border border-gray-100"}>
-        <div
-          className={`w-full h-[350px] md:h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 grid place-items-center text-gray-300 text-6xl ${
-            fullBleed ? "" : "rounded-xl"
-          }`}
-        >
+      <div className="bg-white rounded-2xl p-3 border border-gray-100">
+        <div className="w-full h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl grid place-items-center text-gray-300 text-6xl">
           📦
         </div>
       </div>
@@ -28,12 +73,8 @@ export default function Gallery({
   }
 
   return (
-    <div className={fullBleed ? "" : "bg-white rounded-2xl p-3 border border-gray-100"}>
-      <div
-        className={`w-full h-[350px] md:h-[500px] bg-gray-50 overflow-hidden relative ${
-          fullBleed ? "" : "rounded-xl"
-        }`}
-      >
+    <div className="bg-white rounded-2xl p-3 border border-gray-100">
+      <div className="w-full h-[500px] bg-gray-50 rounded-xl overflow-hidden relative">
         <AnimatePresence mode="wait">
           <motion.img
             key={active}
@@ -69,16 +110,12 @@ export default function Gallery({
       </div>
 
       {images.length > 1 && (
-        <div
-          className={`flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1 ${
-            fullBleed ? "px-4" : ""
-          }`}
-        >
+        <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1">
           {images.map((src, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                 i === active ? "border-orange-500 scale-95" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >

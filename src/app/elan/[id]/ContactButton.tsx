@@ -28,7 +28,7 @@ export default function ContactButton({
       disabled={loading}
       className={
         fullWidth
-          ? "flex items-center justify-center gap-2 w-full bg-blue-500 hover:bg-blue-600 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50"
+          ? "flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition-all disabled:opacity-50"
           : "bg-gray-900 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors disabled:opacity-50"
       }
     >
