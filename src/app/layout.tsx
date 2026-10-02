@@ -11,6 +11,14 @@ export const metadata = {
   description: "Azərbaycanın müasir onlayn bazarı",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#f97316",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="az">
