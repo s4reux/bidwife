@@ -76,9 +76,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
         <span className="text-gray-700 truncate">{listing.title}</span>
       </div>
 
-          {/* ============ MOBİL GÖRÜNÜŞ ============ */}
-      <div className="lg:hidden -mx-4">
-        {/* Şəkil — TAM EKRAN */}
+      {/* ============ MOBİL GÖRÜNÜŞ ============ */}
+      <div className="lg:hidden -mx-4 -mt-6">
+        {/* Şəkil — TAM EKRAAN */}
         <Gallery images={listing.images} title={listing.title} fullBleed />
 
         {/* Başlıq + Meta + Qiymət — BİR KART */}

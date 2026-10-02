@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -8,11 +8,27 @@ import { motion } from "framer-motion";
 export default function BidBox({
   listingId, minBid, loggedIn,
 }: { listingId: string; minBid: number; loggedIn: boolean }) {
-  // 🔑 STRING state — "0" problemi həll olur
   const [amount, setAmount] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentMin, setCurrentMin] = useState(minBid);
   const r = useRouter();
+
+  // Poll — başqası təklif verəndə yenilə
+  useEffect(() => {
+    async function check() {
+      try {
+        const res = await fetch(`/api/listings/${listingId}/bids`, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Number(data.top) !== currentMin) {
+          setCurrentMin(Number(data.top));
+        }
+      } catch {}
+    }
+    const t = setInterval(check, 3000);
+    return () => clearInterval(t);
+  }, [listingId, currentMin]);
 
   if (!loggedIn) {
     return (
@@ -26,13 +42,12 @@ export default function BidBox({
     );
   }
 
-  // Sürətli +N düymələri
   const quick = [
-    { label: "+1", value: minBid + 1 },
-    { label: "+5", value: minBid + 5 },
-    { label: "+10", value: minBid + 10 },
-    { label: "+25", value: minBid + 25 },
-    { label: "+100", value: minBid + 100 },
+    { label: "+1", value: currentMin + 1 },
+    { label: "+5", value: currentMin + 5 },
+    { label: "+10", value: currentMin + 10 },
+    { label: "+25", value: currentMin + 25 },
+    { label: "+100", value: currentMin + 100 },
   ];
 
   async function place() {
@@ -42,8 +57,8 @@ export default function BidBox({
       toast.error("Məbləğ yazın");
       return;
     }
-    if (numAmount <= minBid) {
-      const msg = `Təklif ${minBid.toFixed(2)} ₼-dən böyük olmalıdır`;
+    if (numAmount <= currentMin) {
+      const msg = `Təklif ${currentMin.toFixed(2)} ₼-dən böyük olmalıdır`;
       setErr(msg);
       toast.error(msg);
       return;
@@ -64,12 +79,14 @@ export default function BidBox({
     }
     toast.success("✅ Təklif verildi!");
     setAmount("");
+    setCurrentMin(numAmount);
+
+    // Yalnız server komponentlərini yenilə (səhifə tam refresh olmadan)
     r.refresh();
   }
 
   return (
     <div className="mt-3">
-      {/* Sürətli düymələr */}
       <div className="flex flex-wrap gap-1.5 mb-2">
         {quick.map((q) => (
           <button
@@ -89,15 +106,13 @@ export default function BidBox({
           inputMode="decimal"
           value={amount}
           onChange={(e) => {
-            // Yalnız rəqəm və nöqtə
             const val = e.target.value.replace(/[^0-9.]/g, "");
             setAmount(val);
           }}
-          onFocus={(e) => {
-            // Fokus olduqda 0-ı sil
+          onFocus={() => {
             if (amount === "0") setAmount("");
           }}
-          placeholder={`Min: ${(minBid + 0.01).toFixed(2)} ₼`}
+          placeholder={`Min: ${(currentMin + 0.01).toFixed(2)} ₼`}
           className="border-2 border-gray-200 p-3 rounded-xl flex-1 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none font-medium"
         />
         <motion.button

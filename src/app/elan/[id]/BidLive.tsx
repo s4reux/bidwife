@@ -37,19 +37,21 @@ export default function BidLive({
       } catch {}
     }
 
-    const t = setInterval(load, 3000);
+    const t = setInterval(load, 2500);
     return () => clearInterval(t);
   }, [listingId, bids.length, top]);
 
   return (
     <div>
-      <div className={`transition-all ${flash ? "scale-105" : ""}`}>
+      <div className={`transition-all duration-300 ${flash ? "scale-105" : ""}`}>
         <div className="text-xs text-gray-500 font-medium uppercase tracking-wide">
           Cari təklif
         </div>
-        <div className={`text-3xl font-black mb-1 transition-colors ${
-          flash ? "text-green-600" : "text-orange-600"
-        }`}>
+        <div
+          className={`text-3xl font-black mb-1 transition-colors ${
+            flash ? "text-green-600" : "text-orange-600"
+          }`}
+        >
           {top.toFixed(2)} ₼
         </div>
       </div>
@@ -70,13 +72,16 @@ export default function BidLive({
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className={`w-8 h-8 rounded-full grid place-items-center text-xs font-bold text-white ${
-                    i === 0 ? "bg-gradient-to-br from-amber-400 to-orange-500" : "bg-gray-400"
-                  }`}>
+                  <div
+                    className={`w-8 h-8 rounded-full grid place-items-center text-xs font-bold text-white ${
+                      i === 0 ? "bg-gradient-to-br from-amber-400 to-orange-500" : "bg-gray-400"
+                    }`}
+                  >
                     {b.userName[0].toUpperCase()}
                   </div>
                   <span className="text-sm font-medium">
-                    {i === 0 && "👑 "}{b.userName}
+                    {i === 0 && "👑 "}
+                    {b.userName}
                   </span>
                 </div>
                 <span className={`font-bold ${i === 0 ? "text-orange-600" : "text-gray-700"}`}>

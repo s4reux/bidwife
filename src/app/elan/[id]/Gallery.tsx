@@ -23,8 +23,8 @@ export default function Gallery({
       );
     }
     return (
-      <div className="w-full">
-        <div className="w-full h-[350px] md:h-[500px] bg-gray-50 overflow-hidden relative">
+      <div className="w-full -mt-6">
+        <div className="w-full h-[350px] md:h-[500px] bg-gray-900 overflow-hidden relative">
           <AnimatePresence mode="wait">
             <motion.img
               key={active}
