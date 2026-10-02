@@ -59,7 +59,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const daysLeft = isVip ? Math.ceil((listing.vipUntil!.getTime() - Date.now()) / 86400000) : 0;
   const displayPrice = Number(topBid ?? listing.price).toFixed(2);
 
-  // BidLive üçün hazır initial data
   const initialBids = listing.bids.map((b) => ({
     id: b.id,
     amount: Number(b.amount),
@@ -90,7 +89,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
         {/* Şəkil — TAM EKRAN */}
         <Gallery images={listing.images} title={listing.title} fullBleed />
 
-        {/* Başlıq + Qiymət kartı */}
+        {/* Başlıq + Qiymət + Bid Box */}
         <div className="mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
           {isVip && (
             <div className="px-4 pt-4">
@@ -104,7 +103,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
           </div>
 
-          {/* AUKSION: CANLI Cari təklif */}
+          {/* AUKSION: Cari təklif + BID BOX dərhal altında */}
           {isAuction && (
             <div className="px-4 pb-4">
               <BidLive
@@ -114,10 +113,52 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 variant="compact"
                 ended={ended}
               />
+
               {listing.auctionEnd && !ended && (
                 <div className="text-xs text-gray-500 mt-2">
                   ⏱ Bitmə: {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
                 </div>
+              )}
+
+              {/* Bid box — DƏRHAL cari təklifin altında */}
+              {!ended && !isOwner && (
+                <div className="mt-4 pt-4 border-t">
+                  <BidBox
+                    listingId={listing.id}
+                    minBid={Number(topBid ?? listing.price)}
+                    loggedIn={!!me}
+                  />
+                </div>
+              )}
+
+              {isWinner && (
+                <div className="mt-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 text-center">
+                  <div className="text-3xl">🏆</div>
+                  <div className="font-bold text-green-700 mt-1">Sən qazandın!</div>
+                  {listing.seller.phone && (
+                    <a
+                      href={`tel:${listing.seller.phone}`}
+                      className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2.5 rounded-xl font-bold"
+                    >
+                      📞 {listing.seller.phone}
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {isOwner && (
+                <div className="mt-4 bg-blue-50 text-blue-700 text-xs p-3 rounded-xl font-medium text-center">
+                  Bu sənin elanındır
+                </div>
+              )}
+
+              {!me && !ended && (
+                <Link
+                  href="/giris"
+                  className="block mt-4 text-center bg-orange-600 text-white py-3 rounded-xl font-bold"
+                >
+                  Təklif vermək üçün daxil ol
+                </Link>
               )}
             </div>
           )}
@@ -172,64 +213,21 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-        {/* AUKSION: Bid Box + Təkliflər */}
+        {/* AUKSION: Təkliflər siyahısı */}
         {isAuction && (
-          <>
-            {!ended && !isOwner && (
-              <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
-                <div className="text-sm font-bold mb-3">Təklif ver</div>
-                <BidBox
-                  listingId={listing.id}
-                  minBid={Number(topBid ?? listing.price)}
-                  loggedIn={!!me}
-                />
-              </div>
-            )}
-
-            {isWinner && (
-              <div className="mt-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 text-center">
-                <div className="text-3xl">🏆</div>
-                <div className="font-bold text-green-700 mt-1">Sən qazandın!</div>
-                {listing.seller.phone && (
-                  <a
-                    href={`tel:${listing.seller.phone}`}
-                    className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2.5 rounded-xl font-bold"
-                  >
-                    📞 {listing.seller.phone}
-                  </a>
-                )}
-              </div>
-            )}
-
-            {isOwner && (
-              <div className="mt-3 bg-blue-50 text-blue-700 text-xs p-3 rounded-2xl font-medium text-center">
-                Bu sənin elanındır
-              </div>
-            )}
-
-            {!me && !ended && (
-              <Link
-                href="/giris"
-                className="block mt-3 text-center bg-orange-600 text-white py-3 rounded-xl font-bold"
-              >
-                Təklif vermək üçün daxil ol
-              </Link>
-            )}
-
-            <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
-              <h2 className="font-bold text-base mb-3 flex items-center gap-2">
-                Təkliflər
-                {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
-              </h2>
-              <BidLive
-                listingId={listing.id}
-                initialBids={initialBids}
-                initialTop={initialTop}
-                variant="full"
-                ended={ended}
-              />
-            </div>
-          </>
+          <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
+            <h2 className="font-bold text-base mb-3 flex items-center gap-2">
+              Təkliflər
+              {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+            </h2>
+            <BidLive
+              listingId={listing.id}
+              initialBids={initialBids}
+              initialTop={initialTop}
+              variant="full"
+              ended={ended}
+            />
+          </div>
         )}
 
         {/* Satıcı */}
