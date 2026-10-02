@@ -59,6 +59,15 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const daysLeft = isVip ? Math.ceil((listing.vipUntil!.getTime() - Date.now()) / 86400000) : 0;
   const displayPrice = Number(topBid ?? listing.price).toFixed(2);
 
+  // BidLive üçün hazır initial data
+  const initialBids = listing.bids.map((b) => ({
+    id: b.id,
+    amount: Number(b.amount),
+    userName: b.user.name,
+    createdAt: b.createdAt.toISOString(),
+  }));
+  const initialTop = Number(listing.bids[0]?.amount ?? listing.price);
+
   return (
     <div className="animate-in max-w-6xl mx-auto pb-24 lg:pb-0">
       {/* Breadcrumb — yalnız desktop */}
@@ -78,12 +87,11 @@ export default async function ListingPage({ params }: { params: { id: string } }
 
       {/* ============ MOBİL GÖRÜNÜŞ ============ */}
       <div className="lg:hidden -mx-4 -mt-6">
-        {/* Şəkil — TAM EKRAAN */}
+        {/* Şəkil — TAM EKRAN */}
         <Gallery images={listing.images} title={listing.title} fullBleed />
 
-        {/* Başlıq + Meta + Qiymət — BİR KART */}
+        {/* Başlıq + Qiymət kartı */}
         <div className="mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          {/* VIP badge */}
           {isVip && (
             <div className="px-4 pt-4">
               <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-black px-3 py-1 rounded-full">
@@ -92,62 +100,37 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          {/* Başlıq */}
-          <div className="p-4">
+          <div className="p-4 pb-3">
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
           </div>
-          {/* AUKSION: Bid box burada görünür */}
+
+          {/* AUKSION: CANLI Cari təklif */}
           {isAuction && (
-            <div className="px-4 pb-4 border-t pt-4">
-              {isWinner && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
-                  <div className="text-2xl">🏆</div>
-                  <div className="font-bold text-green-700 text-sm mt-1">Sən qazandın!</div>
-                  {listing.seller.phone && (
-                    <a
-                      href={`tel:${listing.seller.phone}`}
-                      className="mt-2 inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
-                    >
-                      📞 {listing.seller.phone}
-                    </a>
-                  )}
+            <div className="px-4 pb-4">
+              <BidLive
+                listingId={listing.id}
+                initialBids={initialBids}
+                initialTop={initialTop}
+                variant="compact"
+                ended={ended}
+              />
+              {listing.auctionEnd && !ended && (
+                <div className="text-xs text-gray-500 mt-2">
+                  ⏱ Bitmə: {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
                 </div>
-              )}
-
-              {!ended && !isOwner && (
-                <BidBox
-                  listingId={listing.id}
-                  minBid={Number(topBid ?? listing.price)}
-                  loggedIn={!!me}
-                />
-              )}
-
-              {isOwner && (
-                <div className="bg-blue-50 text-blue-700 text-xs p-3 rounded-xl font-medium text-center">
-                  Bu sənin elanındır
-                </div>
-              )}
-
-              {!me && !ended && (
-                <Link
-                  href="/giris"
-                  className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold"
-                >
-                  Təklif vermək üçün daxil ol
-                </Link>
               )}
             </div>
           )}
 
           {/* NORMAL ELAN: sadəcə qiymət */}
           {!isAuction && (
-            <div className="px-4 pb-4 border-t pt-4">
+            <div className="px-4 pb-4">
               <div className="text-3xl font-black text-orange-600">{displayPrice} ₼</div>
             </div>
           )}
 
-                   {/* Meta (Şəhər / Kateqoriya / Vəziyyət) */}
-          <div className="p-4 grid grid-cols-2 gap-4 text-sm">
+          {/* Meta */}
+          <div className="border-t p-4 grid grid-cols-2 gap-4 text-sm">
             {listing.city && (
               <div>
                 <div className="text-xs text-gray-400 mb-0.5">Şəhər</div>
@@ -176,9 +159,10 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 </div>
               </div>
             )}
-          </div>         
- {/* Təsvir — AYNI KARTIN İÇİNDƏ */}
-          <div className="px-4 pb-4">
+          </div>
+
+          {/* Təsvir */}
+          <div className="border-t p-4">
             <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">
               Açıqlama
             </div>
@@ -188,20 +172,64 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-             {/* AUKSİON: Cari təklif + Təkliflər siyahısı */}
+        {/* AUKSION: Bid Box + Təkliflər */}
         {isAuction && (
-          <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
-            <BidLive
-              listingId={listing.id}
-              initialBids={listing.bids.map((b) => ({
-                id: b.id,
-                amount: Number(b.amount),
-                userName: b.user.name,
-                createdAt: b.createdAt.toISOString(),
-              }))}
-              initialTop={Number(listing.bids[0]?.amount ?? listing.price)}
-            />
-          </div>
+          <>
+            {!ended && !isOwner && (
+              <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
+                <div className="text-sm font-bold mb-3">Təklif ver</div>
+                <BidBox
+                  listingId={listing.id}
+                  minBid={Number(topBid ?? listing.price)}
+                  loggedIn={!!me}
+                />
+              </div>
+            )}
+
+            {isWinner && (
+              <div className="mt-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-4 text-center">
+                <div className="text-3xl">🏆</div>
+                <div className="font-bold text-green-700 mt-1">Sən qazandın!</div>
+                {listing.seller.phone && (
+                  <a
+                    href={`tel:${listing.seller.phone}`}
+                    className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2.5 rounded-xl font-bold"
+                  >
+                    📞 {listing.seller.phone}
+                  </a>
+                )}
+              </div>
+            )}
+
+            {isOwner && (
+              <div className="mt-3 bg-blue-50 text-blue-700 text-xs p-3 rounded-2xl font-medium text-center">
+                Bu sənin elanındır
+              </div>
+            )}
+
+            {!me && !ended && (
+              <Link
+                href="/giris"
+                className="block mt-3 text-center bg-orange-600 text-white py-3 rounded-xl font-bold"
+              >
+                Təklif vermək üçün daxil ol
+              </Link>
+            )}
+
+            <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
+              <h2 className="font-bold text-base mb-3 flex items-center gap-2">
+                Təkliflər
+                {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+              </h2>
+              <BidLive
+                listingId={listing.id}
+                initialBids={initialBids}
+                initialTop={initialTop}
+                variant="full"
+                ended={ended}
+              />
+            </div>
+          </>
         )}
 
         {/* Satıcı */}
@@ -243,7 +271,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </>
           )}
 
-          {/* Owner idarəetmə */}
           {isOwner && (
             <div className="mt-4 pt-4 border-t space-y-2">
               <VIPButton
@@ -263,7 +290,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
           )}
         </div>
 
-        {/* BƏNZƏR ELANLAR */}
+        {/* Bənzər elanlar */}
         {similar.length > 0 && (
           <section className="mt-6">
             <div className="flex items-center justify-between mb-3">
@@ -281,7 +308,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </section>
         )}
 
-        {/* Ən aşağıda "Şikayət et" */}
         <div className="mt-6 mb-4">
           <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600">
             <span>🚩</span> Şikayət et
@@ -289,7 +315,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      {/* ============ DESKTOP GÖRÜNÜŞ ============ */}
+      {/* ============ DESKTOP ============ */}
       <div className="hidden lg:grid lg:grid-cols-[1fr_380px] gap-6">
         <div className="space-y-4">
           <Gallery images={listing.images} title={listing.title} />
@@ -329,7 +355,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          {/* AUKSİON: Təkliflər */}
           {isAuction && (
             <div className="bg-white rounded-2xl p-6 border border-gray-100">
               <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
@@ -339,18 +364,14 @@ export default async function ListingPage({ params }: { params: { id: string } }
               </h2>
               <BidLive
                 listingId={listing.id}
-                initialBids={listing.bids.map((b) => ({
-                  id: b.id,
-                  amount: Number(b.amount),
-                  userName: b.user.name,
-                  createdAt: b.createdAt.toISOString(),
-                }))}
-                initialTop={Number(listing.bids[0]?.amount ?? listing.price)}
+                initialBids={initialBids}
+                initialTop={initialTop}
+                variant="full"
+                ended={ended}
               />
             </div>
           )}
 
-          {/* BƏNZƏR ELANLAR */}
           {similar.length > 0 && (
             <section className="pt-2">
               <div className="flex items-center justify-between mb-4">
@@ -369,7 +390,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
           )}
         </div>
 
-        {/* SAĞ sticky */}
         <div className="space-y-4 sticky top-24 self-start">
           <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <h1 className="text-xl font-bold leading-tight mb-3">{listing.title}</h1>
@@ -381,20 +401,21 @@ export default async function ListingPage({ params }: { params: { id: string } }
 
             {isAuction ? (
               <>
-                <div className="text-xs text-gray-500 font-medium uppercase tracking-wide flex items-center gap-2">
-                  {ended ? "Auksion bitdi" : "Cari təklif"}
-                  {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
-                </div>
-                <div className="text-3xl font-black text-orange-600 mb-1">{displayPrice} ₼</div>
+                <BidLive
+                  listingId={listing.id}
+                  initialBids={initialBids}
+                  initialTop={initialTop}
+                  variant="compact"
+                  ended={ended}
+                />
                 {listing.auctionEnd && !ended && (
-                  <div className="text-xs text-gray-500 mb-3">
+                  <div className="text-xs text-gray-500 mb-3 mt-2">
                     ⏱ Bitmə: {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
                   </div>
                 )}
-                {ended && <div className="text-xs text-gray-500 mb-3">Bu auksion artıq bitib</div>}
 
                 {isWinner && (
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center mt-3">
                     <div className="text-2xl">🏆</div>
                     <div className="font-bold text-green-700 text-sm mt-1">Sən qazandın!</div>
                     {listing.seller.phone && (
@@ -416,14 +437,14 @@ export default async function ListingPage({ params }: { params: { id: string } }
                   />
                 )}
                 {isOwner && (
-                  <div className="bg-blue-50 text-blue-700 text-xs p-3 rounded-xl font-medium text-center">
+                  <div className="bg-blue-50 text-blue-700 text-xs p-3 rounded-xl font-medium text-center mt-3">
                     Bu sənin elanındır
                   </div>
                 )}
                 {!me && !ended && (
                   <Link
                     href="/giris"
-                    className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700"
+                    className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 mt-3"
                   >
                     Təklif vermək üçün daxil ol
                   </Link>
@@ -492,7 +513,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-         {/* MOBİL STICKY BOTTOM */}
+      {/* MOBİL STICKY BOTTOM */}
       {!isOwner && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-40 shadow-lg">
           <div className="flex gap-2">
