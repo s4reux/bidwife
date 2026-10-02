@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased flex flex-col min-h-screen">
         <Header />
         <VerifyBanner />
-        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6">{children}</main>
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-6">{children}</main>
 
         <footer className="border-t border-gray-100 bg-white mt-16">
           <div className="max-w-6xl mx-auto px-4 py-10">

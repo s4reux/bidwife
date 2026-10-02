@@ -14,21 +14,30 @@ export default function BidBox({
   const [currentMin, setCurrentMin] = useState(minBid);
   const r = useRouter();
 
-  // Poll — başqası təklif verəndə yenilə
+  // 🔑 Həmişə serverdən min dəyərini çək (polling)
   useEffect(() => {
+    let cancelled = false;
+
     async function check() {
       try {
         const res = await fetch(`/api/listings/${listingId}/bids`, { cache: "no-store" });
         if (!res.ok) return;
         const data = await res.json();
-        if (Number(data.top) !== currentMin) {
+        if (!cancelled) {
           setCurrentMin(Number(data.top));
         }
       } catch {}
     }
-    const t = setInterval(check, 3000);
-    return () => clearInterval(t);
-  }, [listingId, currentMin]);
+
+    check(); // dərhal bir dəfə
+    const t = setInterval(check, 2500);
+    return () => { cancelled = true; clearInterval(t); };
+  }, [listingId]);
+
+  // Prop dəyişsə (server refresh), sinxronlaşdır
+  useEffect(() => {
+    setCurrentMin(minBid);
+  }, [minBid]);
 
   if (!loggedIn) {
     return (
@@ -79,9 +88,7 @@ export default function BidBox({
     }
     toast.success("✅ Təklif verildi!");
     setAmount("");
-    setCurrentMin(numAmount);
-
-    // Yalnız server komponentlərini yenilə (səhifə tam refresh olmadan)
+    setCurrentMin(numAmount); // dərhal öz təklifini göstər
     r.refresh();
   }
 
