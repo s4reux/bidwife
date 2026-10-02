@@ -2,13 +2,25 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Gallery({ images, title }: { images: string[]; title: string }) {
+export default function Gallery({
+  images,
+  title,
+  fullBleed,
+}: {
+  images: string[];
+  title: string;
+  fullBleed?: boolean;
+}) {
   const [active, setActive] = useState(0);
 
   if (!images.length) {
     return (
-      <div className="bg-white rounded-2xl p-3 border border-gray-100">
-        <div className="w-full h-[400px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl grid place-items-center text-gray-300 text-6xl">
+      <div className={fullBleed ? "" : "bg-white rounded-2xl p-3 border border-gray-100"}>
+        <div
+          className={`w-full h-[350px] md:h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 grid place-items-center text-gray-300 text-6xl ${
+            fullBleed ? "" : "rounded-xl"
+          }`}
+        >
           📦
         </div>
       </div>
@@ -16,9 +28,12 @@ export default function Gallery({ images, title }: { images: string[]; title: st
   }
 
   return (
-    <div className="bg-white rounded-2xl p-3 border border-gray-100">
-      {/* 🎯 SABIT HÜNDÜRLÜK: mobil 350px, desktop 500px */}
-      <div className="w-full h-[350px] md:h-[500px] bg-gray-50 rounded-xl overflow-hidden relative">
+    <div className={fullBleed ? "" : "bg-white rounded-2xl p-3 border border-gray-100"}>
+      <div
+        className={`w-full h-[350px] md:h-[500px] bg-gray-50 overflow-hidden relative ${
+          fullBleed ? "" : "rounded-xl"
+        }`}
+      >
         <AnimatePresence mode="wait">
           <motion.img
             key={active}
@@ -54,7 +69,11 @@ export default function Gallery({ images, title }: { images: string[]; title: st
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1">
+        <div
+          className={`flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1 ${
+            fullBleed ? "px-4" : ""
+          }`}
+        >
           {images.map((src, i) => (
             <button
               key={i}

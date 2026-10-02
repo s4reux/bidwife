@@ -32,7 +32,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
   });
   if (!listing) notFound();
 
-  // Bənzər elanlar — eyni kateqoriya, özü olmayan, aktiv
   const similar = await prisma.listing.findMany({
     where: {
       id: { not: listing.id },
@@ -61,8 +60,8 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const displayPrice = Number(topBid ?? listing.price).toFixed(2);
 
   return (
-    <div className="animate-in max-w-6xl mx-auto pb-20 lg:pb-0">
-      {/* Breadcrumb (desktop) */}
+    <div className="animate-in max-w-6xl mx-auto pb-24 lg:pb-0">
+      {/* Breadcrumb — yalnız desktop */}
       <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500 mb-4">
         <Link href="/" className="hover:text-orange-600">Ana səhifə</Link>
         {listing.category && (
@@ -77,38 +76,250 @@ export default async function ListingPage({ params }: { params: { id: string } }
         <span className="text-gray-700 truncate">{listing.title}</span>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_380px] gap-6">
-        {/* SOL */}
+      {/* ============ MOBİL GÖRÜNÜŞ ============ */}
+      <div className="lg:hidden">
+        {/* Şəkil — TAM EKRAN */}
+        <div className="-mx-4">
+          <Gallery images={listing.images} title={listing.title} fullBleed />
+        </div>
+
+        {/* Başlıq + Meta + Qiymət — BİR KART */}
+        <div className="mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          {/* VIP badge */}
+          {isVip && (
+            <div className="px-4 pt-4">
+              <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-black px-3 py-1 rounded-full">
+                👑 VIP ELAN
+              </div>
+            </div>
+          )}
+
+          {/* Başlıq */}
+          <div className="p-4">
+            <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
+          </div>
+
+          {/* AUKSION: Bid box burada görünür */}
+          {isAuction && (
+            <div className="px-4 pb-4 border-t pt-4">
+              <div className="text-xs text-gray-500 font-medium uppercase tracking-wide flex items-center gap-2 mb-1">
+                {ended ? "Auksion bitdi" : "Cari təklif"}
+                {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+              </div>
+              <div className="text-3xl font-black text-orange-600 mb-3">{displayPrice} ₼</div>
+
+              {listing.auctionEnd && !ended && (
+                <div className="text-xs text-gray-500 mb-3">
+                  ⏱ Bitmə: {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
+                </div>
+              )}
+
+              {isWinner && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
+                  <div className="text-2xl">🏆</div>
+                  <div className="font-bold text-green-700 text-sm mt-1">Sən qazandın!</div>
+                  {listing.seller.phone && (
+                    <a
+                      href={`tel:${listing.seller.phone}`}
+                      className="mt-2 inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm"
+                    >
+                      📞 {listing.seller.phone}
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {!ended && !isOwner && (
+                <BidBox
+                  listingId={listing.id}
+                  minBid={Number(topBid ?? listing.price)}
+                  loggedIn={!!me}
+                />
+              )}
+
+              {isOwner && (
+                <div className="bg-blue-50 text-blue-700 text-xs p-3 rounded-xl font-medium text-center">
+                  Bu sənin elanındır
+                </div>
+              )}
+
+              {!me && !ended && (
+                <Link
+                  href="/giris"
+                  className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold"
+                >
+                  Təklif vermək üçün daxil ol
+                </Link>
+              )}
+            </div>
+          )}
+
+          {/* NORMAL ELAN: sadəcə qiymət */}
+          {!isAuction && (
+            <div className="px-4 pb-4 border-t pt-4">
+              <div className="text-3xl font-black text-orange-600">{displayPrice} ₼</div>
+            </div>
+          )}
+
+          {/* Meta (Şəhər / Kateqoriya / Vəziyyət) */}
+          <div className="border-t p-4 grid grid-cols-2 gap-4 text-sm">
+            {listing.city && (
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Şəhər</div>
+                <div className="font-medium">📍 {listing.city}</div>
+              </div>
+            )}
+            {listing.condition && (
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Vəziyyət</div>
+                <div className="font-medium">{CONDITION_LABEL[listing.condition]}</div>
+              </div>
+            )}
+            {listing.category && (
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Kateqoriya</div>
+                <Link href={`/?cat=${listing.category.slug}`} className="font-medium text-orange-600">
+                  {listing.category.name}
+                </Link>
+              </div>
+            )}
+            {listing.auctionEnd && (
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Bitmə vaxtı</div>
+                <div className="font-medium text-xs">
+                  {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Təsvir — AYNI KARTIN İÇİNDƏ */}
+          <div className="border-t p-4">
+            <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">
+              Açıqlama
+            </div>
+            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-[15px]">
+              {listing.description}
+            </p>
+          </div>
+        </div>
+
+        {/* AUKSİON: Təkliflər siyahısı (bid box yuxarıda göründüyü üçün) */}
+        {isAuction && (
+          <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
+            <h2 className="font-bold text-base mb-3 flex items-center gap-2">
+              Təkliflər
+              {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+            </h2>
+            <BidLive
+              listingId={listing.id}
+              initialBids={listing.bids.map((b) => ({
+                id: b.id,
+                amount: Number(b.amount),
+                userName: b.user.name,
+                createdAt: b.createdAt.toISOString(),
+              }))}
+              initialTop={Number(listing.bids[0]?.amount ?? listing.price)}
+            />
+          </div>
+        )}
+
+        {/* Satıcı */}
+        <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
+          <Link href={`/profil/${listing.seller.id}`} className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold">
+              {listing.seller.name[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-gray-400">Satıcı</div>
+              <div className="font-semibold truncate">{listing.seller.name}</div>
+            </div>
+            <div className="text-xs text-orange-600">Bax →</div>
+          </Link>
+
+          {!isOwner && me && listing.seller.phone && (
+            <>
+              {isAuction ? (
+                isWinner ? (
+                  <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
+                    <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
+                    <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800">
+                      {listing.seller.phone}
+                    </a>
+                  </div>
+                ) : (
+                  <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800">
+                    🔒 Əlaqə məlumatları yalnız auksion qalibinə göstərilir
+                  </div>
+                )
+              ) : (
+                <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
+                  <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
+                  <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800">
+                    {listing.seller.phone}
+                  </a>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Owner idarəetmə */}
+          {isOwner && (
+            <div className="mt-4 pt-4 border-t space-y-2">
+              <VIPButton
+                listingId={listing.id}
+                isVip={!!isVip}
+                vipUntil={listing.vipUntil?.toISOString()}
+                minPrice={Number(listing.category?.vipMinPrice ?? 1)}
+                daysLeft={daysLeft}
+              />
+              <Link
+                href={`/elan/${listing.id}/duzenle`}
+                className="block text-center bg-gray-100 text-gray-700 py-3 rounded-xl font-medium text-sm"
+              >
+                ✏️ Redaktə et
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* BƏNZƏR ELANLAR */}
+        {similar.length > 0 && (
+          <section className="mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-black text-base">Bənzər elanlar</h2>
+              <Link
+                href={listing.category ? `/?cat=${listing.category.slug}` : "/"}
+                className="text-sm text-orange-600 font-medium"
+              >
+                Hamısı
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {similar.map((s, i) => <ListingCard key={s.id} l={s} idx={i} />)}
+            </div>
+          </section>
+        )}
+
+        {/* Ən aşağıda "Şikayət et" */}
+        <div className="mt-6 mb-4">
+          <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600">
+            <span>🚩</span> Şikayət et
+          </button>
+        </div>
+      </div>
+
+      {/* ============ DESKTOP GÖRÜNÜŞ ============ */}
+      <div className="hidden lg:grid lg:grid-cols-[1fr_380px] gap-6">
         <div className="space-y-4">
           <Gallery images={listing.images} title={listing.title} />
 
-          {/* MOBİL: Başlıq + Qiymət */}
-          <div className="lg:hidden bg-white rounded-2xl p-5 border border-gray-100">
-            {isVip && (
-              <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-black px-3 py-1 rounded-full mb-3">
-                👑 VIP ELAN
-              </div>
-            )}
-            <h1 className="text-xl font-bold leading-tight">{listing.title}</h1>
-
-            <div className="mt-3">
-              {isAuction ? (
-                <>
-                  <div className="text-xs text-gray-500 font-medium uppercase tracking-wide flex items-center gap-2">
-                    {ended ? "Auksion bitdi" : "Cari təklif"}
-                    {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
-                  </div>
-                  <div className="text-3xl font-black text-orange-600">{displayPrice} ₼</div>
-                </>
-              ) : (
-                <div className="text-3xl font-black text-orange-600">{displayPrice} ₼</div>
-              )}
-            </div>
-          </div>
-
-          {/* Xüsusiyyətlər */}
-          <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <h2 className="font-bold text-lg mb-3">Açıqlama</h2>
+            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-[15px]">
+              {listing.description}
+            </p>
+            <div className="mt-5 pt-5 border-t grid grid-cols-2 gap-4 text-sm">
               {listing.city && (
                 <div>
                   <div className="text-xs text-gray-400 mb-0.5">Şəhər</div>
@@ -129,78 +340,23 @@ export default async function ListingPage({ params }: { params: { id: string } }
                   </Link>
                 </div>
               )}
-              {listing.auctionEnd && (
-                <div>
-                  <div className="text-xs text-gray-400 mb-0.5">Bitmə vaxtı</div>
-                  <div className="font-medium">
-                    {new Date(listing.auctionEnd).toLocaleString("az-AZ")}
-                  </div>
+              <div>
+                <div className="text-xs text-gray-400 mb-0.5">Yerləşdirildi</div>
+                <div className="font-medium">
+                  {new Date(listing.createdAt).toLocaleDateString("az-AZ")}
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
-          {/* Təsvir */}
-          <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100">
-            <h2 className="font-bold text-lg mb-3">Təsvir</h2>
-            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed text-[15px]">
-              {listing.description}
-            </p>
-          </div>
-
-          {/* Satıcı kartı */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
-            <Link href={`/profil/${listing.seller.id}`} className="flex items-center gap-3 group">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold text-lg group-hover:scale-105 transition-transform">
-                {listing.seller.name[0].toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs text-gray-400">Satıcı</div>
-                <div className="font-semibold truncate group-hover:text-orange-600 transition-colors">
-                  {listing.seller.name}
-                </div>
-                <div className="text-[11px] text-orange-600 mt-0.5 opacity-0 group-hover:opacity-100">
-                  Bütün elanlarına bax →
-                </div>
-              </div>
-            </Link>
-
-            {!isOwner && me && listing.seller.phone && (
-              <>
-                {isAuction ? (
-                  isWinner ? (
-                    <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
-                      <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
-                      <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800 hover:underline">
-                        {listing.seller.phone}
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-xs text-amber-800">
-                      🔒 Əlaqə məlumatları yalnız auksion qalibinə göstərilir
-                    </div>
-                  )
-                ) : (
-                  <div className="mt-3 bg-green-50 border border-green-100 rounded-xl p-3">
-                    <div className="text-[10px] text-green-700 uppercase tracking-wide font-bold">Telefon</div>
-                    <a href={`tel:${listing.seller.phone}`} className="font-bold text-green-800 hover:underline">
-                      {listing.seller.phone}
-                    </a>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* AUKSİON: Təkliflər + Bid Box — YALNIZ BİR DƏFƏ */}
+          {/* AUKSİON: Təkliflər */}
           {isAuction && (
-            <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 border border-gray-100">
               <h2 className="font-bold text-lg mb-3 flex items-center gap-2">
                 Təkliflər
                 {!ended && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
                 {!ended && <span className="text-xs text-red-500 font-medium">CANLI</span>}
               </h2>
-
               <BidLive
                 listingId={listing.id}
                 initialBids={listing.bids.map((b) => ({
@@ -211,35 +367,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 }))}
                 initialTop={Number(listing.bids[0]?.amount ?? listing.price)}
               />
-
-              {/* Qiymət təklif barı — yalnız auksion üçün */}
-              {!ended && !isOwner && (
-                <div className="mt-4 pt-4 border-t">
-                  <div className="text-sm font-medium text-gray-700 mb-2">
-                    Sizin təklifiniz:
-                  </div>
-                  <BidBox
-                    listingId={listing.id}
-                    minBid={Number(topBid ?? listing.price)}
-                    loggedIn={!!me}
-                  />
-                </div>
-              )}
-
-              {isWinner && (
-                <div className="mt-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4 text-center">
-                  <div className="text-3xl">🏆</div>
-                  <div className="font-bold text-green-700 mt-1">Sən qazandın!</div>
-                  {listing.seller.phone && (
-                    <a
-                      href={`tel:${listing.seller.phone}`}
-                      className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-2.5 rounded-xl font-bold"
-                    >
-                      📞 {listing.seller.phone}
-                    </a>
-                  )}
-                </div>
-              )}
             </div>
           )}
 
@@ -255,19 +382,19 @@ export default async function ListingPage({ params }: { params: { id: string } }
                   Hamısı
                 </Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 {similar.map((s, i) => <ListingCard key={s.id} l={s} idx={i} />)}
               </div>
             </section>
           )}
         </div>
 
-        {/* SAĞ (desktop) — sticky */}
-        <div className="hidden lg:block space-y-4 sticky top-24 self-start">
+        {/* SAĞ sticky */}
+        <div className="space-y-4 sticky top-24 self-start">
           <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <h1 className="text-xl font-bold leading-tight mb-3">{listing.title}</h1>
             {isVip && (
-              <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-black px-3 py-1 rounded-full mb-3 shadow-sm">
+              <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs font-black px-3 py-1 rounded-full mb-3">
                 👑 VIP ELAN
               </div>
             )}
@@ -316,7 +443,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 {!me && !ended && (
                   <Link
                     href="/giris"
-                    className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition-colors"
+                    className="block text-center bg-orange-600 text-white py-3 rounded-xl font-bold hover:bg-orange-700"
                   >
                     Təklif vermək üçün daxil ol
                   </Link>
@@ -330,7 +457,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 {!isOwner && listing.seller.phone && me && (
                   <a
                     href={`tel:${listing.seller.phone}`}
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl font-bold hover:shadow-lg transition-all mb-2"
+                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl font-bold mb-2"
                   >
                     📞 {listing.seller.phone}
                   </a>
@@ -341,7 +468,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 {!me && (
                   <Link
                     href="/giris"
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl font-bold transition-all"
+                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl font-bold"
                   >
                     📞 Əlaqə üçün daxil ol
                   </Link>
@@ -350,7 +477,20 @@ export default async function ListingPage({ params }: { params: { id: string } }
             )}
           </div>
 
-          {/* Owner: idarəetmə */}
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <Link href={`/profil/${listing.seller.id}`} className="flex items-center gap-3 group">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold text-lg">
+                {listing.seller.name[0].toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs text-gray-400">Satıcı</div>
+                <div className="font-semibold truncate group-hover:text-orange-600">
+                  {listing.seller.name}
+                </div>
+              </div>
+            </Link>
+          </div>
+
           {isOwner && (
             <div className="bg-white rounded-2xl p-5 border border-gray-100 space-y-3">
               <h3 className="font-bold text-sm text-gray-700">İdarəetmə</h3>
@@ -363,7 +503,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
               />
               <Link
                 href={`/elan/${listing.id}/duzenle`}
-                className="block text-center bg-gray-100 text-gray-700 hover:bg-gray-200 py-3 rounded-xl font-medium"
+                className="block text-center bg-gray-100 text-gray-700 py-3 rounded-xl font-medium text-sm"
               >
                 ✏️ Redaktə et
               </Link>
@@ -372,11 +512,11 @@ export default async function ListingPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      {/* MOBİL: Sticky bottom bar */}
+      {/* MOBİL STICKY BOTTOM */}
       {!isOwner && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-40 shadow-lg">
           <div className="flex gap-2">
-            {listing.seller.phone && me ? (
+            {me && listing.seller.phone && (isAuction ? isWinner : true) ? (
               <a
                 href={`tel:${listing.seller.phone}`}
                 className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-bold text-center"
@@ -385,10 +525,14 @@ export default async function ListingPage({ params }: { params: { id: string } }
               </a>
             ) : (
               <Link
-                href="/giris"
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-bold text-center"
+                href={me ? "#" : "/giris"}
+                className={`flex-1 py-3 rounded-xl font-bold text-center ${
+                  isAuction && !isWinner
+                    ? "bg-gray-200 text-gray-500 pointer-events-none"
+                    : "bg-gradient-to-r from-green-500 to-green-600 text-white"
+                }`}
               >
-                📞 Zəng et
+                📞 {isAuction && !isWinner ? "Qalib gözlə" : "Zəng et"}
               </Link>
             )}
             {me ? (
