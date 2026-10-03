@@ -53,7 +53,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && apply()}
             placeholder="Nə axtarırSan?"
-            className="w-full border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 bg-white dark:bg-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+            className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
           />
         </div>
 
@@ -66,7 +66,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
 
         <button
           onClick={() => setOpen(true)}
-          className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-4 rounded-xl hover:border-orange-500 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300"
+          className="relative bg-white border border-gray-200 px-4 rounded-xl hover:border-orange-500 transition-colors flex items-center gap-2"
         >
           <span>⚙️</span>
           <span className="hidden md:inline text-sm font-medium">Filtr</span>
@@ -92,10 +92,10 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: -20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-4"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-lg dark:text-white">Filtrlər</h3>
+                <h3 className="font-bold text-lg">Filtrlər</h3>
                 {activeCount > 0 && (
                   <button onClick={clear} className="text-xs text-red-600 hover:underline">
                     Təmizlə
@@ -104,13 +104,13 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Kateqoriya
                 </label>
                 <select
                   value={cat}
                   onChange={(e) => setCat(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-950 dark:text-white"
+                  className="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
                 >
                   <option value="">Hamısı</option>
                   {categories.map((c) => (
@@ -120,13 +120,13 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Şəhər / Rayon
                 </label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-950 dark:text-white"
+                  className="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
                 >
                   <option value="">Hamısı</option>
                   {ALL_REGIONS_WITH_DIGER.map((c) => (
@@ -136,7 +136,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Vəziyyət
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -153,7 +153,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                       className={`p-2 rounded-lg text-xs border transition-all ${
                         condition === c.v
                           ? "bg-orange-600 text-white border-orange-600"
-                          : "bg-white dark:bg-gray-950 dark:text-white border-gray-200 dark:border-gray-700 hover:border-orange-300"
+                          : "bg-white border-gray-200 hover:border-orange-300"
                       }`}
                     >
                       {c.l}
@@ -163,7 +163,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Elan növü
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -179,7 +179,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                       className={`p-2 rounded-lg text-xs border transition-all ${
                         type === c.v
                           ? "bg-orange-600 text-white border-orange-600"
-                          : "bg-white dark:bg-gray-950 dark:text-white border-gray-200 dark:border-gray-700 hover:border-orange-300"
+                          : "bg-white border-gray-200 hover:border-orange-300"
                       }`}
                     >
                       {c.l}
@@ -189,7 +189,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Qiymət aralığı (₼)
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -198,14 +198,14 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
                     placeholder="Min"
-                    className="border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-950 dark:text-white"
+                    className="border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                   <input
                     type="number"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
                     placeholder="Max"
-                    className="border border-gray-200 dark:border-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white dark:bg-gray-950 dark:text-white"
+                    className="border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200"
                 >
                   Bağla
                 </button>

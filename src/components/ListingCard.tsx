@@ -106,9 +106,9 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
     >
       <Link
         href={`/elan/${l.id}`}
-        className="group block bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg dark:hover:shadow-orange-900/20 transition-all duration-300 h-full"
+        className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 h-full"
       >
-        <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800 overflow-hidden">
+        <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
           {l.images?.[0] ? (
             <img
               src={l.images[0]}
@@ -117,16 +117,14 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full grid place-items-center text-gray-300 dark:text-gray-700 text-5xl">
-              📦
-            </div>
+            <div className="w-full h-full grid place-items-center text-gray-300 text-5xl">📦</div>
           )}
 
           <button
             onClick={toggleFav}
             disabled={favLoading}
-            className={`absolute top-2.5 right-2.5 w-9 h-9 rounded-full backdrop-blur grid place-items-center hover:bg-white dark:hover:bg-gray-800 transition-all shadow-sm ${
-              favorited ? "bg-red-50 dark:bg-red-950" : "bg-white/90 dark:bg-gray-900/90"
+            className={`absolute top-2.5 right-2.5 w-9 h-9 rounded-full backdrop-blur grid place-items-center hover:bg-white transition-all shadow-sm ${
+              favorited ? "bg-red-50" : "bg-white/90"
             } disabled:opacity-50`}
           >
             <svg
@@ -134,7 +132,7 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
               fill={favorited ? "#ef4444" : "none"}
               stroke={favorited ? "#ef4444" : "currentColor"}
               strokeWidth="2"
-              className={favorited ? "" : "text-gray-400 dark:text-gray-500"}
+              className={favorited ? "" : "text-gray-400"}
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
@@ -170,16 +168,16 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
 
         <div className="p-3.5">
           <div className="flex items-baseline gap-1 mb-1.5">
-            <span className="text-lg font-black text-gray-900 dark:text-white">{topBid ?? price}</span>
-            <span className="text-base font-bold text-gray-700 dark:text-gray-300">₼</span>
+            <span className="text-lg font-black text-gray-900">{topBid ?? price}</span>
+            <span className="text-base font-bold text-gray-700">₼</span>
           </div>
 
-          <h3 className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug mb-1.5 min-h-[2.4rem]">
+          <h3 className="text-[14px] font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 min-h-[2.4rem]">
             {l.title}
           </h3>
 
           {(l.category || l.condition) && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
+            <div className="text-xs text-gray-500 mb-2 line-clamp-1">
               {[
                 l.category?.name,
                 l.condition === "NEW" && "Yeni",
@@ -193,14 +191,14 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
               className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-md mb-2 ${
                 urgent
                   ? "bg-red-600 text-white animate-pulse"
-                  : "bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400"
+                  : "bg-red-50 text-red-600"
               }`}
             >
               ⏱ {countdown}
             </div>
           )}
 
-          <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 pt-2 border-t border-gray-50 dark:border-gray-800">
+          <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
             <span className="truncate">📍 {l.city || "—"}</span>
             <span className="whitespace-nowrap">{timeAgo}</span>
           </div>
