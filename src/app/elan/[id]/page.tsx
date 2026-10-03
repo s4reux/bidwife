@@ -64,7 +64,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const shareUrl = `${APP_URL}/elan/${listing.id}`;
 
   const initialBids = listing.bids.map((b) => ({
-  const initialBids = listing.bids.map((b) => ({
     id: b.id,
     amount: Number(b.amount),
     userName: b.user.name,
@@ -73,8 +72,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const initialTop = Number(listing.bids[0]?.amount ?? listing.price);
 
   return (
-      <ViewTracker listingId={listing.id} />
     <div className="animate-in max-w-6xl mx-auto pb-24 lg:pb-0">
+      <ViewTracker listingId={listing.id} />
+
       {/* Breadcrumb — yalnız desktop */}
       <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500 mb-4">
         <Link href="/" className="hover:text-orange-600">Ana səhifə</Link>
@@ -92,10 +92,8 @@ export default async function ListingPage({ params }: { params: { id: string } }
 
       {/* ============ MOBİL GÖRÜNÜŞ ============ */}
       <div className="lg:hidden -mx-4 -mt-6">
-        {/* Şəkil — TAM EKRAN */}
         <Gallery images={listing.images} title={listing.title} fullBleed />
 
-        {/* Başlıq + Qiymət + Bid Box */}
         <div className="mt-3 bg-white rounded-2xl border border-gray-100 overflow-hidden">
           {isVip && (
             <div className="px-4 pt-4">
@@ -105,7 +103,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-                  <div className="p-4 pb-3">
+          <div className="p-4 pb-3">
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
             <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
               <div className="flex items-center gap-3">
@@ -116,7 +114,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          {/* AUKSION: Cari təklif + BID BOX dərhal altında */}
           {isAuction && (
             <div className="px-4 pb-4">
               <BidLive
@@ -133,7 +130,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
                 </div>
               )}
 
-              {/* Bid box — DƏRHAL cari təklifin altında */}
               {!ended && !isOwner && (
                 <div className="mt-4 pt-4 border-t">
                   <BidBox
@@ -176,14 +172,12 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          {/* NORMAL ELAN: sadəcə qiymət */}
           {!isAuction && (
             <div className="px-4 pb-4">
               <div className="text-3xl font-black text-orange-600">{displayPrice} ₼</div>
             </div>
           )}
 
-          {/* Meta */}
           <div className="border-t p-4 grid grid-cols-2 gap-4 text-sm">
             {listing.city && (
               <div>
@@ -215,7 +209,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             )}
           </div>
 
-          {/* Təsvir */}
           <div className="border-t p-4">
             <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide font-medium">
               Açıqlama
@@ -226,7 +219,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         </div>
 
-        {/* AUKSION: Təkliflər siyahısı */}
         {isAuction && (
           <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
             <h2 className="font-bold text-base mb-3 flex items-center gap-2">
@@ -243,7 +235,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         )}
 
-        {/* Satıcı */}
         <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
           <Link href={`/profil/${listing.seller.id}`} className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold">
@@ -301,7 +292,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
           )}
         </div>
 
-        {/* Bənzər elanlar */}
         {similar.length > 0 && (
           <section className="mt-6">
             <div className="flex items-center justify-between mb-3">
