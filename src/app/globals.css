@@ -3,11 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  html { -webkit-tap-highlight-color: transparent; }
   body {
     background: radial-gradient(ellipse at top, #fff7ed 0%, #f9fafb 40%, #f3f4f6 100%);
     min-height: 100vh;
   }
-  * { -webkit-tap-highlight-color: transparent; }
+  .dark body {
+    background: radial-gradient(ellipse at top, #1a1a1a 0%, #0f0f0f 40%, #0a0a0a 100%);
+    color: #e5e5e5;
+  }
+  .dark {
+    color-scheme: dark;
+  }
 }
 
 @layer utilities {
@@ -16,21 +23,24 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .glass { background: rgba(255,255,255,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-  .glass-dark { background: rgba(0,0,0,0.75); backdrop-filter: blur(20px); }
+  .dark .glass { background: rgba(15,15,15,0.75); }
   .gradient-text { background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-  .vip-gradient { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 30%, #8b5cf6 70%, #6366f1 100%); }
   .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
   .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(249,115,22,0.2); }
+  .dark .card-hover:hover { box-shadow: 0 20px 40px -15px rgba(249,115,22,0.4); }
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 5px; border: 2px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background: #d1d5db; background-clip: padding-box; }
+.dark ::-webkit-scrollbar-thumb { background: #404040; background-clip: padding-box; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #525252; background-clip: padding-box; }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .animate-in { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1); }
 .animate-float { animation: float 3s ease-in-out infinite; }
-.shimmer { background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 1000px 100%; animation: shimmer 2s infinite linear; }
+
+html { touch-action: pan-x pan-y; }
+input, textarea, select { font-size: 16px; }

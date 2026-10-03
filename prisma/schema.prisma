@@ -85,6 +85,7 @@ model Listing {
   vipPaid  Decimal?  @db.Decimal(12, 2)
   @@index([condition])
     @@index([vipUntil])
+  views     Int      @default(0)
 }
 
 model Bid {

@@ -8,6 +8,8 @@ import Gallery from "./Gallery";
 import VIPButton from "./VIPButton";
 import BidLive from "./BidLive";
 import ListingCard from "@/components/ListingCard";
+import ViewTracker from "@/components/ViewTracker";
+import ShareButtons from "@/components/ShareButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +60,10 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const isVip = listing.vipUntil && listing.vipUntil > new Date();
   const daysLeft = isVip ? Math.ceil((listing.vipUntil!.getTime() - Date.now()) / 86400000) : 0;
   const displayPrice = Number(topBid ?? listing.price).toFixed(2);
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://bidwife.az";
+  const shareUrl = `${APP_URL}/elan/${listing.id}`;
 
+  const initialBids = listing.bids.map((b) => ({
   const initialBids = listing.bids.map((b) => ({
     id: b.id,
     amount: Number(b.amount),
@@ -68,6 +73,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
   const initialTop = Number(listing.bids[0]?.amount ?? listing.price);
 
   return (
+      <ViewTracker listingId={listing.id} />
     <div className="animate-in max-w-6xl mx-auto pb-24 lg:pb-0">
       {/* Breadcrumb — yalnız desktop */}
       <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500 mb-4">
@@ -99,8 +105,15 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          <div className="p-4 pb-3">
+                  <div className="p-4 pb-3">
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
+            <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">👁 {listing.views || 0}</span>
+                <span>{new Date(listing.createdAt).toLocaleDateString("az-AZ")}</span>
+              </div>
+              <ShareButtons title={listing.title} url={shareUrl} />
+            </div>
           </div>
 
           {/* AUKSION: Cari təklif + BID BOX dərhal altında */}
