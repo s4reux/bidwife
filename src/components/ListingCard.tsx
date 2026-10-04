@@ -12,10 +12,13 @@ function useTimeAgo(date: string) {
       const m = Math.floor(diff / 60000);
       const h = Math.floor(m / 60);
       const d = Math.floor(h / 24);
-      if (m < 1) setText("indi");
-      else if (m < 60) setText(`${m} dəq əvvəl`);
-      else if (h < 24) setText(`${h} saat əvvəl`);
-      else if (d < 30) setText(`${d} gün əvvəl`);
+      const timeStr = new Date(date).toLocaleTimeString("az-AZ", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      if (m < 60) setText(`Bu gün, ${timeStr}`);
+      else if (h < 24) setText(`Bu gün, ${timeStr}`);
+      else if (d < 7) setText(`${d} gün əvvəl`);
       else setText(new Date(date).toLocaleDateString("az-AZ"));
     };
     update();
@@ -63,7 +66,6 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
   );
   const timeAgo = useTimeAgo(l.createdAt);
   const isVip = l.vipUntil && new Date(l.vipUntil) > new Date();
-  const imageCount = l.images?.length || 0;
 
   useEffect(() => {
     fetch("/api/favorites")
@@ -86,11 +88,8 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
     setFavLoading(false);
     if (!res.ok) {
       const data = await res.json();
-      if (res.status === 401) {
-        toast.error("Favorilərə əlavə etmək üçün daxil ol");
-      } else {
-        toast.error(data.error || "Xəta");
-      }
+      if (res.status === 401) toast.error("Favorilərə əlavə etmək üçün daxil ol");
+      else toast.error(data.error || "Xəta");
       return;
     }
     const data = await res.json();
@@ -100,15 +99,12 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(idx * 0.03, 0.3) }}
+      transition={{ delay: Math.min(idx * 0.025, 0.25) }}
     >
-      <Link
-        href={`/elan/${l.id}`}
-        className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 h-full"
-      >
-        <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+      <Link href={`/elan/${l.id}`} className="group block h-full">
+        <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2">
           {l.images?.[0] ? (
             <img
               src={l.images[0]}
@@ -117,90 +113,74 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full grid place-items-center text-gray-300 text-5xl">📦</div>
+            <div className="w-full h-full grid place-items-center text-gray-300 text-4xl">📦</div>
           )}
 
           <button
             onClick={toggleFav}
             disabled={favLoading}
-            className={`absolute top-2.5 right-2.5 w-9 h-9 rounded-full backdrop-blur grid place-items-center hover:bg-white transition-all shadow-sm ${
-              favorited ? "bg-red-50" : "bg-white/90"
-            } disabled:opacity-50`}
+            className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur grid place-items-center transition-all shadow-sm ${
+              favorited ? "bg-white" : "bg-white/85"
+            }`}
           >
             <svg
-              width="18" height="18" viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
               fill={favorited ? "#ef4444" : "none"}
-              stroke={favorited ? "#ef4444" : "currentColor"}
-              strokeWidth="2"
-              className={favorited ? "" : "text-gray-400"}
+              stroke={favorited ? "#ef4444" : "#6b7280"}
+              strokeWidth="2.5"
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
 
-          {imageCount > 1 && (
-            <div className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              {imageCount}
-            </div>
-          )}
-
           {isVip && (
-            <div className="absolute bottom-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
+            <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded">
               👑 VIP
             </div>
           )}
 
-          {l.type === "AUCTION" && !isVip && (
-            <div
-              className={`absolute top-2.5 left-2.5 text-[10px] px-2.5 py-1 rounded-full font-bold ${
-                ended ? "bg-gray-900/80 text-white" : "bg-red-500/90 text-white animate-pulse"
-              }`}
-            >
-              {ended ? "Bitdi" : "🔴 AUKSION"}
+          {l.type === "AUCTION" && !ended && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded animate-pulse">
+              ● CANLI
+            </div>
+          )}
+          {l.type === "AUCTION" && ended && (
+            <div className="absolute top-2 left-2 bg-gray-800/90 text-white text-[9px] font-bold px-2 py-1 rounded">
+              Bitdi
             </div>
           )}
         </div>
 
-        <div className="p-3.5">
-          <div className="flex items-baseline gap-1 mb-1.5">
-            <span className="text-lg font-black text-gray-900">{topBid ?? price}</span>
-            <span className="text-base font-bold text-gray-700">₼</span>
+        <div className="px-0.5">
+          <div className="text-[15px] font-black text-gray-900 leading-tight mb-0.5">
+            {topBid ?? price} <span className="text-[13px] font-bold">₼</span>
           </div>
 
-          <h3 className="text-[14px] font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 min-h-[2.4rem]">
+          <h3 className="text-[13px] text-gray-800 leading-snug line-clamp-2 mb-1">
             {l.title}
           </h3>
 
-          {(l.category || l.condition) && (
-            <div className="text-xs text-gray-500 mb-2 line-clamp-1">
-              {[
-                l.category?.name,
-                l.condition === "NEW" && "Yeni",
-                l.condition === "LIKE_NEW" && "Yeni kimi",
-              ].filter(Boolean).join(" • ")}
-            </div>
-          )}
-
           {l.type === "AUCTION" && !ended && countdown && (
             <div
-              className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-md mb-2 ${
-                urgent
-                  ? "bg-red-600 text-white animate-pulse"
-                  : "bg-red-50 text-red-600"
+              className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded mb-1 ${
+                urgent ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-600"
               }`}
             >
-              ⏱ {countdown}
+              <span className="w-1 h-1 bg-current rounded-full" />
+              {countdown}
             </div>
           )}
 
-          <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
-            <span className="truncate">📍 {l.city || "—"}</span>
-            <span className="whitespace-nowrap">{timeAgo}</span>
+          <div className="flex items-center justify-between gap-1 text-[11px] text-gray-400">
+            <span className="truncate">
+              {l.city || "—"}, {timeAgo}
+            </span>
+            <div className="flex items-center gap-1 shrink-0">
+              {isVip && <span className="text-amber-500 text-[10px]">👑</span>}
+              {l.type === "AUCTION" && <span className="text-red-500 text-[10px]">🔶</span>}
+            </div>
           </div>
         </div>
       </Link>

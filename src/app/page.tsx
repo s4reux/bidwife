@@ -95,11 +95,11 @@ export default async function Home({
   return (
     <div className="animate-in">
       {!isSearching && (
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3 text-gray-900">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-4xl font-black tracking-tight mb-2 text-gray-900">
             <span className="gradient-text">Al, sat, auksion</span> et
           </h1>
-          <p className="text-gray-500 text-sm md:text-base">
+          <p className="text-gray-500 text-xs md:text-sm">
             Azərbaycanın müasir onlayn bazarı
           </p>
         </div>
@@ -145,7 +145,7 @@ export default async function Home({
             </h2>
             <div className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {vipListings.map((l, i) => <ListingCard key={l.id} l={l} idx={i} />)}
           </div>
         </section>
@@ -155,7 +155,7 @@ export default async function Home({
         {regularListings.length} elan {isSearching && "tapıldı"}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
         {regularListings.map((l, i) => <ListingCard key={l.id} l={l} idx={i} />)}
       </div>
 
