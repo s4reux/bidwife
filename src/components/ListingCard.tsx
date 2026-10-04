@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -16,8 +15,7 @@ function useTimeAgo(date: string) {
         hour: "2-digit",
         minute: "2-digit",
       });
-      if (m < 60) setText(`Bu gün, ${timeStr}`);
-      else if (h < 24) setText(`Bu gün, ${timeStr}`);
+      if (h < 24) setText(`Bu gün, ${timeStr}`);
       else if (d < 7) setText(`${d} gün əvvəl`);
       else setText(new Date(date).toLocaleDateString("az-AZ"));
     };
@@ -52,7 +50,7 @@ function useCountdown(end?: string | null) {
   return { text, urgent };
 }
 
-export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
+export default function ListingCard({ l }: { l: any; idx?: number }) {
   const [favorited, setFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
 
@@ -98,92 +96,94 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(idx * 0.025, 0.25) }}
+    <Link
+      href={`/elan/${l.id}`}
+      className="block h-full active:opacity-70 transition-opacity"
     >
-      <Link href={`/elan/${l.id}`} className="group block h-full">
-        <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2">
-          {l.images?.[0] ? (
-            <img
-              src={l.images[0]}
-              alt={l.title}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="w-full h-full grid place-items-center text-gray-300 text-4xl">📦</div>
-          )}
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2">
+        {l.images?.[0] ? (
+          <img
+            src={
+              l.images[0].includes("ik.imagekit.io")
+                ? `${l.images[0]}?tr=w-400,h-400,q-80,f-webp`
+                : l.images[0]
+            }
+            alt={l.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full grid place-items-center text-gray-300 text-4xl">📦</div>
+        )}
 
-          <button
-            onClick={toggleFav}
-            disabled={favLoading}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur grid place-items-center transition-all shadow-sm ${
-              favorited ? "bg-white" : "bg-white/85"
+        <button
+          onClick={toggleFav}
+          disabled={favLoading}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur grid place-items-center transition-all shadow-sm z-10 ${
+            favorited ? "bg-white" : "bg-white/85"
+          }`}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill={favorited ? "#ef4444" : "none"}
+            stroke={favorited ? "#ef4444" : "#6b7280"}
+            strokeWidth="2.5"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
+
+        {isVip && (
+          <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded">
+            👑 VIP
+          </div>
+        )}
+
+        {l.type === "AUCTION" && !ended && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded animate-pulse">
+            ● CANLI
+          </div>
+        )}
+        {l.type === "AUCTION" && ended && (
+          <div className="absolute top-2 left-2 bg-gray-800/90 text-white text-[9px] font-bold px-2 py-1 rounded">
+            Bitdi
+          </div>
+        )}
+      </div>
+
+      <div className="px-0.5">
+        <div className="text-[15px] font-black text-gray-900 leading-tight mb-0.5">
+          {topBid ?? price} <span className="text-[13px] font-bold">₼</span>
+        </div>
+
+        <h3 className="text-[13px] text-gray-800 leading-snug line-clamp-2 mb-1">
+          {l.title}
+        </h3>
+
+        {l.type === "AUCTION" && !ended && countdown && (
+          <div
+            className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded mb-1 ${
+              urgent ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-600"
             }`}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill={favorited ? "#ef4444" : "none"}
-              stroke={favorited ? "#ef4444" : "#6b7280"}
-              strokeWidth="2.5"
-            >
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-          </button>
-
-          {isVip && (
-            <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded">
-              👑 VIP
-            </div>
-          )}
-
-          {l.type === "AUCTION" && !ended && (
-            <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded animate-pulse">
-              ● CANLI
-            </div>
-          )}
-          {l.type === "AUCTION" && ended && (
-            <div className="absolute top-2 left-2 bg-gray-800/90 text-white text-[9px] font-bold px-2 py-1 rounded">
-              Bitdi
-            </div>
-          )}
-        </div>
-
-        <div className="px-0.5">
-          <div className="text-[15px] font-black text-gray-900 leading-tight mb-0.5">
-            {topBid ?? price} <span className="text-[13px] font-bold">₼</span>
+            <span className="w-1 h-1 bg-current rounded-full" />
+            {countdown}
           </div>
+        )}
 
-          <h3 className="text-[13px] text-gray-800 leading-snug line-clamp-2 mb-1">
-            {l.title}
-          </h3>
-
-          {l.type === "AUCTION" && !ended && countdown && (
-            <div
-              className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded mb-1 ${
-                urgent ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              <span className="w-1 h-1 bg-current rounded-full" />
-              {countdown}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between gap-1 text-[11px] text-gray-400">
-            <span className="truncate">
-              {l.city || "—"}, {timeAgo}
-            </span>
-            <div className="flex items-center gap-1 shrink-0">
-              {isVip && <span className="text-amber-500 text-[10px]">👑</span>}
-              {l.type === "AUCTION" && <span className="text-red-500 text-[10px]">🔶</span>}
-            </div>
+        <div className="flex items-center justify-between gap-1 text-[11px] text-gray-400">
+          <span className="truncate">
+            {l.city || "—"}, {timeAgo}
+          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            {isVip && <span className="text-amber-500 text-[10px]">👑</span>}
+            {l.type === "AUCTION" && <span className="text-red-500 text-[10px]">🔶</span>}
           </div>
         </div>
-      </Link>
-    </motion.div>
+      </div>
+    </Link>
   );
 }
