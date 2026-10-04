@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import WinModal from "@/components/WinModal";
 import AuctionCron from "@/components/AuctionCron";
 import VerifyBanner from "@/components/VerifyBanner";
+import BottomNavServer from "@/components/BottomNavServer";
 
 export const metadata = {
   title: "BidWife — Al, sat, auksion et",
@@ -37,9 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased flex flex-col min-h-screen bg-gray-50 text-gray-900">
         <Header />
         <VerifyBanner />
-        <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-6">{children}</main>
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-6 pb-24 lg:pb-6">
+          {children}
+        </main>
 
-        <footer className="border-t border-gray-100 bg-white mt-16">
+        <footer className="hidden lg:block border-t border-gray-100 bg-white mt-16">
           <div className="max-w-6xl mx-auto px-4 py-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
               <div>
@@ -89,6 +92,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </footer>
+
+        <BottomNavServer />
 
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
         <WinModal />
