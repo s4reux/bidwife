@@ -86,27 +86,24 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
     setFavLoading(false);
     if (!res.ok) {
       const data = await res.json();
-      if (res.status === 401) {
-        toast.error("Favorilərə əlavə etmək üçün daxil ol");
-      } else {
-        toast.error(data.error || "Xəta");
-      }
+      if (res.status === 401) toast.error("Favorilərə əlavə etmək üçün daxil ol");
+      else toast.error(data.error || "Xəta");
       return;
     }
     const data = await res.json();
     setFavorited(data.favorited);
-    toast.success(data.favorited ? "❤️ Favorilərə əlavə edildi" : "Favorilərdən silindi");
+    toast.success(data.favorited ? "Favorilərə əlavə edildi" : "Favorilərdən silindi");
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(idx * 0.03, 0.3) }}
+      transition={{ delay: Math.min(idx * 0.025, 0.25) }}
     >
       <Link
         href={`/elan/${l.id}`}
-        className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 h-full"
+        className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 h-full"
       >
         <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
           {l.images?.[0] ? (
@@ -114,93 +111,89 @@ export default function ListingCard({ l, idx = 0 }: { l: any; idx?: number }) {
               src={l.images[0]}
               alt={l.title}
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
           ) : (
-            <div className="w-full h-full grid place-items-center text-gray-300 text-5xl">📦</div>
+            <div className="w-full h-full grid place-items-center text-gray-300 text-4xl">📦</div>
           )}
 
+          {/* Ürək */}
           <button
             onClick={toggleFav}
             disabled={favLoading}
-            className={`absolute top-2.5 right-2.5 w-9 h-9 rounded-full backdrop-blur grid place-items-center hover:bg-white transition-all shadow-sm ${
-              favorited ? "bg-red-50" : "bg-white/90"
-            } disabled:opacity-50`}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/95 backdrop-blur grid place-items-center hover:bg-white transition-all shadow-sm"
           >
             <svg
-              width="18" height="18" viewBox="0 0 24 24"
+              width="16" height="16" viewBox="0 0 24 24"
               fill={favorited ? "#ef4444" : "none"}
-              stroke={favorited ? "#ef4444" : "currentColor"}
-              strokeWidth="2"
-              className={favorited ? "" : "text-gray-400"}
+              stroke={favorited ? "#ef4444" : "#9ca3af"}
+              strokeWidth="2.5"
             >
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
 
-          {imageCount > 1 && (
-            <div className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <path d="M21 15l-5-5L5 21" />
-              </svg>
-              {imageCount}
-            </div>
-          )}
-
+          {/* VIP badge */}
           {isVip && (
-            <div className="absolute bottom-2.5 right-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
-              👑 VIP
+            <div className="absolute top-3 left-3 bg-black/85 backdrop-blur text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+              <span>👑</span> VIP
             </div>
           )}
 
+          {/* Auksion badge */}
           {l.type === "AUCTION" && !isVip && (
             <div
-              className={`absolute top-2.5 left-2.5 text-[10px] px-2.5 py-1 rounded-full font-bold ${
-                ended ? "bg-gray-900/80 text-white" : "bg-red-500/90 text-white animate-pulse"
+              className={`absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                ended
+                  ? "bg-gray-900/85 text-white"
+                  : "bg-white/95 backdrop-blur text-red-600"
               }`}
             >
-              {ended ? "Bitdi" : "🔴 AUKSION"}
+              {ended ? "Bitdi" : "● CANLI"}
+            </div>
+          )}
+
+          {/* Şəkil sayı */}
+          {imageCount > 1 && (
+            <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur text-white text-[10px] font-medium px-2 py-1 rounded-md">
+              +{imageCount - 1}
             </div>
           )}
         </div>
 
         <div className="p-3.5">
-          <div className="flex items-baseline gap-1 mb-1.5">
-            <span className="text-lg font-black text-gray-900">{topBid ?? price}</span>
-            <span className="text-base font-bold text-gray-700">₼</span>
+          {/* Qiymət */}
+          <div className="mb-2">
+            <span className="text-xl font-black text-gray-900">
+              {topBid ?? price}
+            </span>
+            <span className="text-sm font-bold text-gray-500 ml-0.5">₼</span>
           </div>
 
-          <h3 className="text-[14px] font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 min-h-[2.4rem]">
+          {/* Başlıq */}
+          <h3 className="text-[13.5px] font-medium text-gray-800 line-clamp-2 leading-snug mb-2 min-h-[2.3rem]">
             {l.title}
           </h3>
 
-          {(l.category || l.condition) && (
-            <div className="text-xs text-gray-500 mb-2 line-clamp-1">
-              {[
-                l.category?.name,
-                l.condition === "NEW" && "Yeni",
-                l.condition === "LIKE_NEW" && "Yeni kimi",
-              ].filter(Boolean).join(" • ")}
-            </div>
-          )}
-
+          {/* Auksion vaxtı */}
           {l.type === "AUCTION" && !ended && countdown && (
             <div
-              className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-md mb-2 ${
-                urgent
-                  ? "bg-red-600 text-white animate-pulse"
-                  : "bg-red-50 text-red-600"
+              className={`inline-flex items-center gap-1 text-[10.5px] font-bold px-2 py-1 rounded-md mb-2 ${
+                urgent ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-600"
               }`}
             >
-              ⏱ {countdown}
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />
+              {countdown}
             </div>
           )}
 
+          {/* Meta */}
           <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-50">
-            <span className="truncate">📍 {l.city || "—"}</span>
-            <span className="whitespace-nowrap">{timeAgo}</span>
+            <span className="truncate">{l.city || "—"}</span>
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              {l.views > 0 && <span>👁 {l.views}</span>}
+              <span>{timeAgo}</span>
+            </span>
           </div>
         </div>
       </Link>
