@@ -49,7 +49,7 @@ function useCountdown(end?: string | null) {
   return { text, urgent };
 }
 
-export default function ListingCard({ l }: { l: any }) {
+export default function ListingCard({ l, idx }: { l: any; idx?: number }) {
   const [favorited, setFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
 
