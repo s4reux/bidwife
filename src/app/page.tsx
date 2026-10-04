@@ -72,7 +72,7 @@ export default async function Home({
     prisma.listing.findMany({
       where: { ...where, OR: [{ vipUntil: null }, { vipUntil: { lte: now } }] },
       orderBy: { createdAt: "desc" },
-      take: 60,
+      take: 40,
       select,
     }),
     prisma.category.findMany({
@@ -93,7 +93,7 @@ export default async function Home({
   ].filter(Boolean) as { k: string; v: string }[];
 
   return (
-    <div className="animate-in">
+    <div>
       {!isSearching && (
         <div className="mb-6 text-center">
           <h1 className="text-2xl md:text-4xl font-black tracking-tight mb-2 text-gray-900">
@@ -146,7 +146,7 @@ export default async function Home({
             <div className="flex-1 h-px bg-gradient-to-r from-amber-200 to-transparent" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-            {vipListings.map((l, i) => <ListingCard key={l.id} l={l} idx={i} />)}
+            {vipListings.map((l) => <ListingCard key={l.id} l={l} />)}
           </div>
         </section>
       )}
@@ -156,7 +156,7 @@ export default async function Home({
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        {regularListings.map((l, i) => <ListingCard key={l.id} l={l} idx={i} />)}
+        {regularListings.map((l) => <ListingCard key={l.id} l={l} />)}
       </div>
 
       {regularListings.length === 0 && vipListings.length === 0 && (

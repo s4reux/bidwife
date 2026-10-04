@@ -8,8 +8,7 @@ function useTimeAgo(date: string) {
   useEffect(() => {
     const update = () => {
       const diff = Date.now() - new Date(date).getTime();
-      const m = Math.floor(diff / 60000);
-      const h = Math.floor(m / 60);
+      const h = Math.floor(diff / 3600000);
       const d = Math.floor(h / 24);
       const timeStr = new Date(date).toLocaleTimeString("az-AZ", {
         hour: "2-digit",
@@ -50,7 +49,7 @@ function useCountdown(end?: string | null) {
   return { text, urgent };
 }
 
-export default function ListingCard({ l }: { l: any; idx?: number }) {
+export default function ListingCard({ l }: { l: any }) {
   const [favorited, setFavorited] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
 
@@ -96,10 +95,7 @@ export default function ListingCard({ l }: { l: any; idx?: number }) {
   }
 
   return (
-    <Link
-      href={`/elan/${l.id}`}
-      className="block h-full active:opacity-70 transition-opacity"
-    >
+    <Link href={`/elan/${l.id}`} className="block">
       <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2">
         {l.images?.[0] ? (
           <img
@@ -118,11 +114,13 @@ export default function ListingCard({ l }: { l: any; idx?: number }) {
         )}
 
         <button
+          type="button"
           onClick={toggleFav}
           disabled={favLoading}
-          className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur grid place-items-center transition-all shadow-sm z-10 ${
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full grid place-items-center transition-all shadow-sm z-20 ${
             favorited ? "bg-white" : "bg-white/85"
           }`}
+          style={{ pointerEvents: "auto" }}
         >
           <svg
             width="16"
@@ -137,18 +135,18 @@ export default function ListingCard({ l }: { l: any; idx?: number }) {
         </button>
 
         {isVip && (
-          <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded">
+          <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded z-20">
             👑 VIP
           </div>
         )}
 
         {l.type === "AUCTION" && !ended && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded animate-pulse">
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded z-20">
             ● CANLI
           </div>
         )}
         {l.type === "AUCTION" && ended && (
-          <div className="absolute top-2 left-2 bg-gray-800/90 text-white text-[9px] font-bold px-2 py-1 rounded">
+          <div className="absolute top-2 left-2 bg-gray-800/90 text-white text-[9px] font-bold px-2 py-1 rounded z-20">
             Bitdi
           </div>
         )}

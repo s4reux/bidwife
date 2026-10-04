@@ -10,18 +10,6 @@ import BottomNavServer from "@/components/BottomNavServer";
 export const metadata = {
   title: "BidWife — Al, sat, auksion et",
   description: "Azərbaycanın müasir onlayn bazarı",
-  openGraph: {
-    title: "BidWife — Al, sat, auksion et",
-    description: "Azərbaycanın müasir onlayn bazarı",
-    type: "website",
-    locale: "az_AZ",
-    siteName: "BidWife",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "BidWife",
-    description: "Azərbaycanın müasir onlayn bazarı",
-  },
 };
 
 export const viewport = {
