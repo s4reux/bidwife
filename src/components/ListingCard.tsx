@@ -95,8 +95,8 @@ export default function ListingCard({ l, idx }: { l: any; idx?: number }) {
   }
 
   return (
-    <Link href={`/elan/${l.id}`} className="block">
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2">
+    <Link href={`/elan/${l.id}`} className="block group">
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 mb-2 shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
         {l.images?.[0] ? (
           <img
             src={
@@ -107,7 +107,7 @@ export default function ListingCard({ l, idx }: { l: any; idx?: number }) {
             alt={l.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full grid place-items-center text-gray-300 text-4xl">📦</div>
