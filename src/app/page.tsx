@@ -98,13 +98,19 @@ export default async function Home({
 
       {!isSearching && (
         <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide">
-          <Link href="/" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-gray-900 text-white">Hamısı</Link>
-          <Link href="/?type=AUCTION" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:border-orange-500 transition-all">🔴 Auksionlar</Link>
-          <Link href="/?type=FIXED" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:border-orange-500 transition-all">💰 Sabit qiymət</Link>
+          <Link href="/" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-gray-900 text-white">
+            Hamısı
+          </Link>
+          <Link href="/?type=AUCTION" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:border-orange-500 transition-all">
+            Auksionlar
+          </Link>
+          <Link href="/?type=FIXED" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:border-orange-500 transition-all">
+            Sabit qiymət
+          </Link>
           {categories.slice(0, 8).map((c) => (
             <Link key={c.id} href={`/?cat=${c.slug}`}
               className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-white border border-gray-200 hover:border-orange-500 transition-all">
-              {c.emoji} {c.name}
+              {c.name}
             </Link>
           ))}
           <Link href="/kateqoriyalar" className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">
@@ -128,7 +134,6 @@ export default async function Home({
       {vipListings.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <div className="text-2xl">👑</div>
             <h2 className="font-black text-lg bg-gradient-to-r from-amber-500 to-purple-600 bg-clip-text text-transparent">
               VIP ELANLAR
             </h2>

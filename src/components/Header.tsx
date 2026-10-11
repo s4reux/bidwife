@@ -27,9 +27,16 @@ export default async function Header() {
         </Link>
 
         <nav className="hidden md:flex gap-1 text-sm">
-          <Link href="/" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all">Hamısı</Link>
-          <Link href="/kateqoriyalar" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all">Kateqoriyalar</Link>
-          <Link href="/?type=AUCTION" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all">🔴 Auksionlar</Link>
+          <Link href="/" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all">
+            Hamısı
+          </Link>
+          <Link href="/kateqoriyalar" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all">
+            Kateqoriyalar
+          </Link>
+          <Link href="/?type=AUCTION" className="px-3 py-2 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-all flex items-center gap-1.5">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            Auksionlar
+          </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-1.5 text-sm">
@@ -37,14 +44,19 @@ export default async function Header() {
             href="/elan/yeni"
             className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-orange-500/30 transition-all font-medium flex items-center gap-1.5 text-sm"
           >
-            <span className="text-lg leading-none">+</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
             <span className="hidden sm:inline">Elan ver</span>
           </Link>
 
           {user ? (
             <>
               <Link href="/mesajlar" className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
-                <span className="text-lg">💬</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-700">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
                 {unreadMsgs > 0 && (
                   <span className="absolute top-1 right-1 bg-blue-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 font-bold">
                     {unreadMsgs > 9 ? "9+" : unreadMsgs}
@@ -60,7 +72,11 @@ export default async function Header() {
               </Link>
               <form action="/api/auth/logout" method="POST" className="hidden sm:block">
                 <button className="text-gray-400 hover:text-red-600 transition-colors p-2" title="Çıxış">
-                  ⏻
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
                 </button>
               </form>
             </>

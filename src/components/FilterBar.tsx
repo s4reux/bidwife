@@ -46,30 +46,45 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
   return (
     <>
       <div className="flex gap-2 mb-5">
-        <div className="flex-1 relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        {/* Search box - içində Axtar düyməsi */}
+        <div className="flex-1 relative flex items-center bg-white border border-gray-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
+          <span className="pl-4 pr-2 text-gray-400">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && apply()}
             placeholder="Nə axtarırSan?"
-            className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+            className="flex-1 py-3.5 pr-2 text-[15px] bg-transparent outline-none placeholder-gray-400"
           />
+          <button
+            onClick={apply}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 m-1 rounded-xl font-medium text-[14px] transition-colors"
+          >
+            Axtar
+          </button>
         </div>
 
         <button
-          onClick={apply}
-          className="bg-orange-600 text-white px-5 rounded-xl hover:bg-orange-700 transition-colors font-medium"
-        >
-          Axtar
-        </button>
-
-        <button
           onClick={() => setOpen(true)}
-          className="relative bg-white border border-gray-200 px-4 rounded-xl hover:border-orange-500 transition-colors flex items-center gap-2"
+          className="relative bg-white border border-gray-200 px-4 rounded-2xl hover:border-orange-500 transition-colors flex items-center gap-2"
         >
-          <span>⚙️</span>
-          <span className="hidden md:inline text-sm font-medium">Filtr</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-700">
+            <line x1="4" y1="21" x2="4" y2="14"/>
+            <line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/>
+            <line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+            <line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+          <span className="hidden md:inline text-sm font-medium text-gray-700">Filtr</span>
           {activeCount > 0 && (
             <span className="bg-orange-600 text-white text-xs w-5 h-5 rounded-full grid place-items-center">
               {activeCount}
@@ -114,7 +129,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                 >
                   <option value="">Hamısı</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.slug}>{c.emoji} {c.name}</option>
+                    <option key={c.id} value={c.slug}>{c.name}</option>
                   ))}
                 </select>
               </div>
@@ -142,9 +157,9 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { v: "", l: "Hamısı" },
-                    { v: "NEW", l: "🆕 Yeni" },
-                    { v: "LIKE_NEW", l: "✨ Yeni kimi" },
-                    { v: "USED", l: "📦 İşlənmiş" },
+                    { v: "NEW", l: "Yeni" },
+                    { v: "LIKE_NEW", l: "Yeni kimi" },
+                    { v: "USED", l: "İşlənmiş" },
                   ].map((c) => (
                     <button
                       key={c.v}
@@ -169,8 +184,8 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { v: "", l: "Hamısı" },
-                    { v: "AUCTION", l: "🔴 Auksion" },
-                    { v: "FIXED", l: "💰 Sabit" },
+                    { v: "AUCTION", l: "Auksion" },
+                    { v: "FIXED", l: "Sabit" },
                   ].map((c) => (
                     <button
                       key={c.v}
