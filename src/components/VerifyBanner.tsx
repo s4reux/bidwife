@@ -1,10 +1,22 @@
-import { getCurrentUser } from "@/lib/session";
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function VerifyBanner() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-  if (user.emailVerified) return null;
+export default function VerifyBanner({ emailVerified }: { emailVerified: boolean }) {
+  const [dismissed, setDismissed] = useState(true);
+
+  useEffect(() => {
+    const d = localStorage.getItem("verify_banner_dismissed");
+    if (d === "1") setDismissed(true);
+    else setDismissed(false);
+  }, []);
+
+  function dismiss() {
+    localStorage.setItem("verify_banner_dismissed", "1");
+    setDismissed(true);
+  }
+
+  if (emailVerified || dismissed) return null;
 
   return (
     <div className="bg-amber-50 border-b border-amber-200">
@@ -19,6 +31,14 @@ export default async function VerifyBanner() {
         >
           Təsdiqlə
         </Link>
+        <button
+          type="button"
+          onClick={dismiss}
+          className="text-amber-700 hover:text-amber-900 text-lg leading-none p-1"
+          aria-label="Bağla"
+        >
+          ✕
+        </button>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import WinModal from "@/components/WinModal";
 import AuctionCron from "@/components/AuctionCron";
 import VerifyBanner from "@/components/VerifyBanner";
 import BottomNavServer from "@/components/BottomNavServer";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata = {
   title: "BidWife — Al, sat, auksion et",
@@ -15,17 +16,17 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#f97316",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
+
   return (
     <html lang="az">
       <body className="antialiased flex flex-col min-h-screen bg-gray-50 text-gray-900">
         <Header />
-        <VerifyBanner />
+        <VerifyBanner emailVerified={user?.emailVerified ?? false} />
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-6 pb-24 lg:pb-6">
           {children}
         </main>
@@ -42,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   Azərbaycanın müasir onlayn elan və auksion platforması.
                 </p>
               </div>
-
               <div>
                 <div className="font-bold text-sm mb-3 text-gray-900">Platforma</div>
                 <ul className="space-y-2 text-xs text-gray-500">
@@ -52,7 +52,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <li><Link href="/elan/yeni" className="hover:text-orange-600">Elan ver</Link></li>
                 </ul>
               </div>
-
               <div>
                 <div className="font-bold text-sm mb-3 text-gray-900">Şirkət</div>
                 <ul className="space-y-2 text-xs text-gray-500">
@@ -62,7 +61,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <li><Link href="/privacy" className="hover:text-orange-600">Məxfilik Siyasəti</Link></li>
                 </ul>
               </div>
-
               <div>
                 <div className="font-bold text-sm mb-3 text-gray-900">Əlaqə</div>
                 <ul className="space-y-2 text-xs text-gray-500">
@@ -72,7 +70,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </ul>
               </div>
             </div>
-
             <div className="pt-6 border-t border-gray-100 text-center">
               <p className="text-xs text-gray-400">
                 © {new Date().getFullYear()} BidWife — Bütün hüquqlar qorunur
@@ -82,7 +79,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </footer>
 
         <BottomNavServer />
-
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
         <WinModal />
         <AuctionCron />

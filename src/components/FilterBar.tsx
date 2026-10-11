@@ -45,36 +45,36 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
 
   return (
     <>
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-5">
         <div className="flex-1 relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && apply()}
             placeholder="Nə axtarırSan?"
-            className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-[14px] bg-white focus:border-orange-500 focus:ring-0 outline-none transition-colors"
+            className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
           />
         </div>
 
         <button
-          onClick={() => setOpen(true)}
-          className="relative bg-white border border-gray-300 px-3 rounded-md hover:border-orange-500 transition-colors flex items-center gap-1.5 text-[13px] text-gray-700"
+          onClick={apply}
+          className="bg-orange-600 text-white px-5 rounded-xl hover:bg-orange-700 transition-colors font-medium"
         >
-          <span>⚙️</span>
-          <span className="hidden md:inline font-medium">Filtr</span>
-          {activeCount > 0 && (
-            <span className="bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full grid place-items-center font-bold">
-              {activeCount}
-            </span>
-          )}
+          Axtar
         </button>
 
         <button
-          onClick={apply}
-          className="bg-orange-600 text-white px-5 rounded-md hover:bg-orange-700 transition-colors font-medium text-[13px]"
+          onClick={() => setOpen(true)}
+          className="relative bg-white border border-gray-200 px-4 rounded-xl hover:border-orange-500 transition-colors flex items-center gap-2"
         >
-          Axtar
+          <span>⚙️</span>
+          <span className="hidden md:inline text-sm font-medium">Filtr</span>
+          {activeCount > 0 && (
+            <span className="bg-orange-600 text-white text-xs w-5 h-5 rounded-full grid place-items-center">
+              {activeCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -85,48 +85,48 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-4 pt-16 overflow-auto"
+            className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-4 pt-20 overflow-auto"
           >
             <motion.div
-              initial={{ scale: 0.96 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.96 }}
+              initial={{ scale: 0.95, y: -20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: -20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl w-full max-w-md p-5 space-y-4"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-[15px]">Filtrlər</h3>
+                <h3 className="font-bold text-lg">Filtrlər</h3>
                 {activeCount > 0 && (
-                  <button onClick={clear} className="text-[12px] text-red-600 hover:underline">
+                  <button onClick={clear} className="text-xs text-red-600 hover:underline">
                     Təmizlə
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="text-[12px] font-medium text-gray-600 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Kateqoriya
                 </label>
                 <select
                   value={cat}
                   onChange={(e) => setCat(e.target.value)}
-                  className="w-full border border-gray-300 p-2 rounded-md text-[13px] outline-none focus:border-orange-500 bg-white"
+                  className="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
                 >
                   <option value="">Hamısı</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.slug}>{c.name}</option>
+                    <option key={c.id} value={c.slug}>{c.emoji} {c.name}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-[12px] font-medium text-gray-600 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Şəhər / Rayon
                 </label>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full border border-gray-300 p-2 rounded-md text-[13px] outline-none focus:border-orange-500 bg-white"
+                  className="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none bg-white"
                 >
                   <option value="">Hamısı</option>
                   {ALL_REGIONS_WITH_DIGER.map((c) => (
@@ -136,24 +136,24 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-[12px] font-medium text-gray-600 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Vəziyyət
                 </label>
-                <div className="grid grid-cols-4 gap-1">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { v: "", l: "Hamısı" },
-                    { v: "NEW", l: "Yeni" },
-                    { v: "LIKE_NEW", l: "Yeni kimi" },
-                    { v: "USED", l: "İşl." },
+                    { v: "NEW", l: "🆕 Yeni" },
+                    { v: "LIKE_NEW", l: "✨ Yeni kimi" },
+                    { v: "USED", l: "📦 İşlənmiş" },
                   ].map((c) => (
                     <button
                       key={c.v}
                       type="button"
                       onClick={() => setCondition(c.v)}
-                      className={`p-2 rounded-md text-[12px] border transition-colors ${
+                      className={`p-2 rounded-lg text-xs border transition-all ${
                         condition === c.v
                           ? "bg-orange-600 text-white border-orange-600"
-                          : "bg-white border-gray-300 hover:border-orange-500"
+                          : "bg-white border-gray-200 hover:border-orange-300"
                       }`}
                     >
                       {c.l}
@@ -163,23 +163,23 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-[12px] font-medium text-gray-600 mb-1 block">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Elan növü
                 </label>
-                <div className="grid grid-cols-3 gap-1">
+                <div className="grid grid-cols-3 gap-2">
                   {[
                     { v: "", l: "Hamısı" },
-                    { v: "AUCTION", l: "Auksion" },
-                    { v: "FIXED", l: "Sabit" },
+                    { v: "AUCTION", l: "🔴 Auksion" },
+                    { v: "FIXED", l: "💰 Sabit" },
                   ].map((c) => (
                     <button
                       key={c.v}
                       type="button"
                       onClick={() => setType(c.v)}
-                      className={`p-2 rounded-md text-[12px] border transition-colors ${
+                      className={`p-2 rounded-lg text-xs border transition-all ${
                         type === c.v
                           ? "bg-orange-600 text-white border-orange-600"
-                          : "bg-white border-gray-300 hover:border-orange-500"
+                          : "bg-white border-gray-200 hover:border-orange-300"
                       }`}
                     >
                       {c.l}
@@ -189,8 +189,8 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
               </div>
 
               <div>
-                <label className="text-[12px] font-medium text-gray-600 mb-1 block">
-                  Qiymət (₼)
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Qiymət aralığı (₼)
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <input
@@ -198,28 +198,28 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
                     value={minPrice}
                     onChange={(e) => setMinPrice(e.target.value)}
                     placeholder="Min"
-                    className="border border-gray-300 p-2 rounded-md text-[13px] outline-none focus:border-orange-500"
+                    className="border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                   <input
                     type="number"
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value)}
                     placeholder="Max"
-                    className="border border-gray-300 p-2 rounded-md text-[13px] outline-none focus:border-orange-500"
+                    className="border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-md font-medium text-[13px] hover:bg-gray-200"
+                  className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200"
                 >
                   Bağla
                 </button>
                 <button
                   onClick={apply}
-                  className="flex-1 bg-orange-600 text-white py-2 rounded-md font-medium text-[13px] hover:bg-orange-700"
+                  className="flex-1 bg-orange-600 text-white py-2.5 rounded-lg font-medium hover:bg-orange-700"
                 >
                   Tətbiq et
                 </button>
