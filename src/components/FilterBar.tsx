@@ -47,10 +47,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
     <>
       <div className="flex gap-2 mb-4">
         <div className="flex-1 relative">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[13px]">🔍</span>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -64,17 +61,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
           onClick={() => setOpen(true)}
           className="relative bg-white border border-gray-300 px-3 rounded-md hover:border-orange-500 transition-colors flex items-center gap-1.5 text-[13px] text-gray-700"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="4" y1="21" x2="4" y2="14"/>
-            <line x1="4" y1="10" x2="4" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="12"/>
-            <line x1="12" y1="8" x2="12" y2="3"/>
-            <line x1="20" y1="21" x2="20" y2="16"/>
-            <line x1="20" y1="12" x2="20" y2="3"/>
-            <line x1="1" y1="14" x2="7" y2="14"/>
-            <line x1="9" y1="8" x2="15" y2="8"/>
-            <line x1="17" y1="16" x2="23" y2="16"/>
-          </svg>
+          <span>⚙️</span>
           <span className="hidden md:inline font-medium">Filtr</span>
           {activeCount > 0 && (
             <span className="bg-orange-600 text-white text-[10px] w-4 h-4 rounded-full grid place-items-center font-bold">

@@ -27,22 +27,13 @@ export default async function Header() {
         </Link>
 
         <nav className="hidden md:flex gap-0.5 text-[13px]">
-          <Link
-            href="/"
-            className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors"
-          >
+          <Link href="/" className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors">
             Elanlar
           </Link>
-          <Link
-            href="/kateqoriyalar"
-            className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors"
-          >
+          <Link href="/kateqoriyalar" className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors">
             Kateqoriyalar
           </Link>
-          <Link
-            href="/?type=AUCTION"
-            className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors"
-          >
+          <Link href="/?type=AUCTION" className="px-2.5 py-1.5 text-gray-700 hover:text-orange-600 transition-colors">
             Auksionlar
           </Link>
         </nav>
@@ -57,13 +48,8 @@ export default async function Header() {
 
           {user ? (
             <>
-              <Link
-                href="/mesajlar"
-                className="relative p-2 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
+              <Link href="/mesajlar" className="relative p-2 hover:bg-gray-100 rounded-md transition-colors">
+                <span className="text-base">💬</span>
                 {unreadMsgs > 0 && (
                   <span className="absolute top-0.5 right-0.5 bg-red-500 text-white text-[9px] min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5 font-bold">
                     {unreadMsgs > 9 ? "9+" : unreadMsgs}
@@ -71,10 +57,7 @@ export default async function Header() {
                 )}
               </Link>
               <NotificationBell />
-              <Link
-                href="/kabinet"
-                className="flex items-center gap-1.5 p-1 hover:bg-gray-100 rounded-md transition-colors"
-              >
+              <Link href="/kabinet" className="flex items-center gap-1.5 p-1 hover:bg-gray-100 rounded-md transition-colors">
                 <div className="w-7 h-7 rounded-full bg-orange-600 text-white grid place-items-center font-bold text-[11px]">
                   {user.name[0].toUpperCase()}
                 </div>
@@ -85,16 +68,10 @@ export default async function Header() {
             </>
           ) : (
             <>
-              <Link
-                href="/giris"
-                className="px-3 py-1.5 text-[13px] text-gray-700 hover:text-orange-600 font-medium transition-colors"
-              >
+              <Link href="/giris" className="px-3 py-1.5 text-[13px] text-gray-700 hover:text-orange-600 font-medium transition-colors">
                 Giriş
               </Link>
-              <Link
-                href="/qeydiyyat"
-                className="bg-gray-900 text-white px-3.5 py-1.5 rounded-md hover:bg-gray-800 transition-colors font-medium text-[13px]"
-              >
+              <Link href="/qeydiyyat" className="bg-gray-900 text-white px-3.5 py-1.5 rounded-md hover:bg-gray-800 transition-colors font-medium text-[13px]">
                 Qeydiyyat
               </Link>
             </>

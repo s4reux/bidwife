@@ -96,7 +96,7 @@ export default async function Home({
     <div>
       <FilterBar categories={categories} />
 
-      {/* Kateqoriya chips - yalnız axtarış olmayanda */}
+      {/* Kateqoriya chips */}
       {!isSearching && (
         <div className="flex gap-1.5 mb-4 overflow-x-auto pb-1 scrollbar-hide">
           <Link href="/" className="whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] font-medium bg-gray-900 text-white">
@@ -104,6 +104,9 @@ export default async function Home({
           </Link>
           <Link href="/?type=AUCTION" className="whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] font-medium bg-white border border-gray-200 hover:border-gray-400 transition-colors">
             Auksionlar
+          </Link>
+          <Link href="/?type=FIXED" className="whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] font-medium bg-white border border-gray-200 hover:border-gray-400 transition-colors">
+            Sabit qiymət
           </Link>
           {categories.slice(0, 10).map((c) => (
             <Link
@@ -114,6 +117,9 @@ export default async function Home({
               {c.name}
             </Link>
           ))}
+          <Link href="/kateqoriyalar" className="whitespace-nowrap px-3 py-1.5 rounded-full text-[13px] font-medium bg-orange-50 text-orange-700 border border-orange-200">
+            Hamısı →
+          </Link>
         </div>
       )}
 
@@ -138,11 +144,8 @@ export default async function Home({
             <h2 className="text-[15px] font-bold text-gray-900 flex items-center gap-1.5">
               <span className="text-amber-500">★</span> VIP Elanlar
             </h2>
-            <Link href="/?type=VIP" className="text-[12px] text-gray-500 hover:text-gray-900">
-              Hamısı
-            </Link>
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {vipListings.map((l) => <ListingCard key={l.id} l={l} />)}
           </div>
         </section>
@@ -159,7 +162,7 @@ export default async function Home({
           </span>
         </div>
 
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {regularListings.map((l) => <ListingCard key={l.id} l={l} />)}
         </div>
 

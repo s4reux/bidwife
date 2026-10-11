@@ -8,12 +8,14 @@ function useTimeAgo(date: string) {
   useEffect(() => {
     const update = () => {
       const diff = Date.now() - new Date(date).getTime();
-      const m = Math.floor(diff / 60000);
-      const h = Math.floor(m / 60);
+      const h = Math.floor(diff / 3600000);
       const d = Math.floor(h / 24);
-      if (m < 60) setText(`${m} dəq əvvəl`);
-      else if (h < 24) setText(`${h} saat əvvəl`);
-      else if (d < 30) setText(`${d} gün əvvəl`);
+      const timeStr = new Date(date).toLocaleTimeString("az-AZ", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      if (h < 24) setText(`Bu gün, ${timeStr}`);
+      else if (d < 7) setText(`${d} gün əvvəl`);
       else setText(new Date(date).toLocaleDateString("az-AZ"));
     };
     update();
@@ -103,13 +105,12 @@ export default function ListingCard({ l, idx }: { l: any; idx?: number }) {
             alt={l.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
           />
         ) : (
           <div className="w-full h-full grid place-items-center text-gray-300 text-3xl">📷</div>
         )}
 
-        {/* Ürək */}
         <button
           type="button"
           onClick={toggleFav}
