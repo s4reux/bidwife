@@ -46,10 +46,9 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
   return (
     <>
       <div className="flex gap-2 mb-5">
-        {/* Search box - içində Axtar düyməsi */}
-        <div className="flex-1 relative flex items-center bg-white border border-gray-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
-          <span className="pl-4 pr-2 text-gray-400">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="flex-1 flex items-center bg-white border border-gray-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
+          <span className="pl-3 md:pl-4 pr-1.5 text-gray-400 shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.35-4.35"/>
             </svg>
@@ -59,11 +58,11 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && apply()}
             placeholder="Nə axtarırSan?"
-            className="flex-1 py-3.5 pr-2 text-[15px] bg-transparent outline-none placeholder-gray-400"
+            className="flex-1 min-w-0 py-3.5 pr-1 text-[14px] md:text-[15px] bg-transparent outline-none placeholder-gray-400"
           />
           <button
             onClick={apply}
-            className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 m-1 rounded-xl font-medium text-[14px] transition-colors"
+            className="bg-orange-600 hover:bg-orange-700 text-white px-3 md:px-5 py-2.5 m-1 rounded-xl font-medium text-[13px] md:text-[14px] transition-colors shrink-0"
           >
             Axtar
           </button>
@@ -71,7 +70,7 @@ export default function FilterBar({ categories }: { categories: Category[] }) {
 
         <button
           onClick={() => setOpen(true)}
-          className="relative bg-white border border-gray-200 px-4 rounded-2xl hover:border-orange-500 transition-colors flex items-center gap-2"
+          className="relative bg-white border border-gray-200 px-4 rounded-2xl hover:border-orange-500 transition-colors flex items-center gap-2 shrink-0"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-700">
             <line x1="4" y1="21" x2="4" y2="14"/>
