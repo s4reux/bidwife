@@ -9,9 +9,38 @@ import VIPButton from "./VIPButton";
 import BidLive from "./BidLive";
 import ListingCard from "@/components/ListingCard";
 import ViewTracker from "@/components/ViewTracker";
-import ShareButtons from "@/components/ShareButtons";
+import ShareButtons from "./ShareButtons";
+import ReportButton from "./ReportButton";
+import ReviewButton from "./ReviewButton";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const listing = await prisma.listing.findUnique({
+    where: { id: params.id },
+    select: { title: true, description: true, price: true, images: true },
+  });
+  if (!listing) return { title: "Elan tapılmadı" };
+
+  const price = Number(listing.price).toFixed(0);
+
+  return {
+    title: `${listing.title} — ${price} ₼`,
+    description: listing.description.slice(0, 155),
+    openGraph: {
+      title: `${listing.title} — ${price} ₼`,
+      description: listing.description.slice(0, 155),
+      images: listing.images[0] ? [listing.images[0]] : ["/og-image.png"],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: listing.title,
+      description: listing.description.slice(0, 155),
+      images: listing.images[0] ? [listing.images[0]] : ["/og-image.png"],
+    },
+  };
+}
 
 const CONDITION_LABEL: Record<string, string> = {
   NEW: "🆕 Yeni",
@@ -105,7 +134,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
 
           <div className="p-4 pb-3">
             <h1 className="text-lg font-bold leading-snug">{listing.title}</h1>
-            <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">👁 {listing.views || 0}</span>
                 <span>{new Date(listing.createdAt).toLocaleDateString("az-AZ")}</span>
@@ -235,6 +264,7 @@ export default async function ListingPage({ params }: { params: { id: string } }
           </div>
         )}
 
+        {/* Satıcı */}
         <div className="mt-3 bg-white rounded-2xl p-4 border border-gray-100">
           <Link href={`/profil/${listing.seller.id}`} className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-white grid place-items-center font-bold">
@@ -292,6 +322,14 @@ export default async function ListingPage({ params }: { params: { id: string } }
           )}
         </div>
 
+        {/* 🚩 Şikayət + ⭐ Rəy — YALNIZ SAHİBİ OLMAYANLAR ÜÇÜN */}
+        {!isOwner && (
+          <div className="mt-6 flex justify-center gap-6 border-t pt-4">
+            <ReportButton listingId={listing.id} loggedIn={!!me} />
+            <ReviewButton listingId={listing.id} loggedIn={!!me} />
+          </div>
+        )}
+
         {similar.length > 0 && (
           <section className="mt-6">
             <div className="flex items-center justify-between mb-3">
@@ -308,12 +346,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           </section>
         )}
-
-        <div className="mt-6 mb-4">
-          <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-600">
-            <span>🚩</span> Şikayət et
-          </button>
-        </div>
       </div>
 
       {/* ============ DESKTOP ============ */}
@@ -509,6 +541,14 @@ export default async function ListingPage({ params }: { params: { id: string } }
               >
                 ✏️ Redaktə et
               </Link>
+            </div>
+          )}
+
+          {/* 🚩 Şikayət + ⭐ Rəy — DESKTOP */}
+          {!isOwner && (
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-center gap-6">
+              <ReportButton listingId={listing.id} loggedIn={!!me} />
+              <ReviewButton listingId={listing.id} loggedIn={!!me} />
             </div>
           )}
         </div>

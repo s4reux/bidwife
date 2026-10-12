@@ -8,9 +8,48 @@ import VerifyBanner from "@/components/VerifyBanner";
 import BottomNavServer from "@/components/BottomNavServer";
 import { getCurrentUser } from "@/lib/session";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://bidwife-m4yj.vercel.app";
+
 export const metadata = {
-  title: "BidWife — Al, sat, auksion et",
-  description: "Azərbaycanın müasir onlayn bazarı",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "BidWife — Al, sat, auksion et",
+    template: "%s | BidWife",
+  },
+  description: "Azərbaycanın müasir onlayn bazarı. Minlərlə elan, canlı auksionlar, təhlükəsiz alış-veriş.",
+  keywords: ["bazar", "elan", "auksion", "alış-veriş", "Bakı", "Azərbaycan", "BidWife"],
+  authors: [{ name: "BidWife" }],
+  openGraph: {
+    type: "website",
+    locale: "az_AZ",
+    url: APP_URL,
+    siteName: "BidWife",
+    title: "BidWife — Al, sat, auksion et",
+    description: "Azərbaycanın müasir onlayn bazarı",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "BidWife",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BidWife",
+    description: "Azərbaycanın müasir onlayn bazarı",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
 };
 
 export const viewport = {

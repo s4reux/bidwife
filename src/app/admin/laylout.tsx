@@ -21,6 +21,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/istifadeciler" className="px-4 py-2 rounded-xl bg-white border hover:border-orange-500 text-sm font-medium whitespace-nowrap">
           👥 İstifadəçilər
         </Link>
+        <Link href="/admin/sikayetler" className="px-4 py-2 rounded-xl bg-white border hover:border-orange-500 text-sm font-medium whitespace-nowrap">
+          🚨 Şikayətlər
+        </Link>
       </nav>
 
       {children}
