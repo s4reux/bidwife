@@ -4,21 +4,76 @@ import { prisma } from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      checks: ["none"],
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-next-auth.callback-url`,
+      options: {
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: `__Host-next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `__Secure-next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+        maxAge: 60 * 15,
+      },
+    },
+    state: {
+      name: `__Secure-next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+        maxAge: 60 * 15,
+      },
+    },
+  },
   pages: { signIn: "/giris" },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       if (!user.email) return false;
-
       try {
-        // Google istifadəçisini DB-də yarat və ya tap
         await prisma.user.upsert({
           where: { email: user.email },
           update: {
