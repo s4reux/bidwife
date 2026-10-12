@@ -21,6 +21,13 @@ export async function PUT(req: Request) {
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
   if (!dbUser) return NextResponse.json({ error: "İstifadəçi tapılmadı" }, { status: 404 });
 
+  if (!dbUser.password) {
+    return NextResponse.json(
+      { error: "Google ilə qeydiyyatdan keçmisiniz. Şifrə dəyişdirilə bilməz." },
+      { status: 400 }
+    );
+  }
+
   const valid = await verifyPassword(p.data.currentPassword, dbUser.password);
   if (!valid) return NextResponse.json({ error: "Cari şifrə yanlışdır" }, { status: 400 });
 
