@@ -544,7 +544,6 @@ export default async function ListingPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          {/* 🚩 Şikayət + ⭐ Rəy — DESKTOP */}
           {!isOwner && (
             <div className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-center gap-6">
               <ReportButton listingId={listing.id} loggedIn={!!me} />
@@ -557,24 +556,30 @@ export default async function ListingPage({ params }: { params: { id: string } }
       {/* MOBİL STICKY BOTTOM */}
       {!isOwner && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 z-40 shadow-lg">
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {me && listing.seller.phone && (isAuction ? isWinner : true) ? (
               <a
                 href={`tel:${listing.seller.phone}`}
-                className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-bold text-center"
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-bold text-sm whitespace-nowrap"
               >
-                📞 Zəng et
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                Zəng et
               </a>
             ) : (
               <Link
                 href={me ? "#" : "/giris"}
-                className={`flex-1 py-3 rounded-xl font-bold text-center ${
+                className={`flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm whitespace-nowrap ${
                   isAuction && !isWinner
                     ? "bg-gray-200 text-gray-500 pointer-events-none"
                     : "bg-gradient-to-r from-green-500 to-green-600 text-white"
                 }`}
               >
-                📞 {isAuction && !isWinner ? "Qalib gözlə" : "Zəng et"}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                {isAuction && !isWinner ? "Qalib gözlə" : "Zəng et"}
               </Link>
             )}
             {me ? (
@@ -582,9 +587,12 @@ export default async function ListingPage({ params }: { params: { id: string } }
             ) : (
               <Link
                 href="/giris"
-                className="flex-1 bg-blue-500 text-white py-3 rounded-xl font-bold text-center"
+                className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-bold text-sm whitespace-nowrap"
               >
-                💬 Mesaj yaz
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Mesaj yaz
               </Link>
             )}
           </div>
@@ -592,4 +600,4 @@ export default async function ListingPage({ params }: { params: { id: string } }
       )}
     </div>
   );
-}
+} 
