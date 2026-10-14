@@ -3,24 +3,23 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Vercel-də işləmək üçün vacibdir
   trustHost: true,
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  // Əsas sirri burada təyin edirik
+  secret: process.env.AUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      // Vercel-də yaranan PKCE xətalarını aradan qaldırır
       checks: ["none"],
-      authorization: {
-        params: {
-          prompt: "select_account",
-        },
-      },
     }),
   ],
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  // Vercel serverless funksiyaları üçün cookie ayarları
   cookies: {
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
