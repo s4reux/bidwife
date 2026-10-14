@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   if (!user || !user.password) {
     return NextResponse.json(
-      { error: "Email və ya şifrə yanlışdır. Google ilə daxil olun." },
+      { error: "Email və ya şifrə yanlışdır" },
       { status: 401 }
     );
   }
