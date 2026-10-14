@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function VerifyBanner({ emailVerified }: { emailVerified: boolean }) {
+export default function VerifyBanner({
+  loggedIn,
+  emailVerified,
+}: {
+  loggedIn: boolean;
+  emailVerified: boolean;
+}) {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
@@ -16,7 +22,10 @@ export default function VerifyBanner({ emailVerified }: { emailVerified: boolean
     setDismissed(true);
   }
 
-  if (emailVerified || dismissed) return null;
+  // Yalnız login olan + təsdiqlənməmiş + dismiss edilməmiş
+  if (!loggedIn) return null;
+  if (emailVerified) return null;
+  if (dismissed) return null;
 
   return (
     <div className="bg-amber-50 border-b border-amber-200">

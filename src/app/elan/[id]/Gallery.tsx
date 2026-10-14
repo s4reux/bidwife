@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Gallery({
@@ -12,19 +12,46 @@ export default function Gallery({
   fullBleed?: boolean;
 }) {
   const [active, setActive] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  // FULL-BLEED: edge-to-edge, kart yoxdur
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.changedTouches[0].screenX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    touchEndX.current = e.changedTouches[0].screenX;
+    handleSwipe();
+  }
+
+  function handleSwipe() {
+    const diff = touchStartX.current - touchEndX.current;
+    const minSwipe = 50;
+
+    if (diff > minSwipe) {
+      // sola sürüşdü → növbəti
+      setActive((p) => (p === images.length - 1 ? 0 : p + 1));
+    } else if (diff < -minSwipe) {
+      // sağa sürüşdü → əvvəlki
+      setActive((p) => (p === 0 ? images.length - 1 : p - 1));
+    }
+  }
+
   if (fullBleed) {
     if (!images.length) {
       return (
         <div className="w-full h-[350px] bg-gradient-to-br from-gray-50 to-gray-100 grid place-items-center text-gray-300 text-6xl">
-          📦
+          📷
         </div>
       );
     }
     return (
       <div className="w-full -mt-6">
-        <div className="w-full h-[350px] md:h-[500px] bg-gray-900 overflow-hidden relative">
+        <div
+          className="w-full h-[350px] md:h-[500px] bg-gray-900 overflow-hidden relative"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <AnimatePresence mode="wait">
             <motion.img
               key={active}
@@ -35,6 +62,7 @@ export default function Gallery({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
             />
           </AnimatePresence>
 
@@ -44,12 +72,12 @@ export default function Gallery({
                 {active + 1} / {images.length}
               </div>
               <div className="absolute bottom-3 left-3 flex gap-1.5 max-w-[60%] overflow-x-auto scrollbar-hide">
-                {images.slice(0, 5).map((_, i) => (
+                {images.slice(0, 8).map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setActive(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === active ? "bg-white w-6" : "bg-white/50"
+                    className={`flex-shrink-0 h-1.5 rounded-full transition-all ${
+                      i === active ? "bg-white w-6" : "bg-white/50 w-1.5"
                     }`}
                   />
                 ))}
@@ -61,12 +89,11 @@ export default function Gallery({
     );
   }
 
-  // NORMAL (desktop)
   if (!images.length) {
     return (
       <div className="bg-white rounded-2xl p-3 border border-gray-100">
         <div className="w-full h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl grid place-items-center text-gray-300 text-6xl">
-          📦
+          📷
         </div>
       </div>
     );
@@ -74,7 +101,11 @@ export default function Gallery({
 
   return (
     <div className="bg-white rounded-2xl p-3 border border-gray-100">
-      <div className="w-full h-[500px] bg-gray-50 rounded-xl overflow-hidden relative">
+      <div
+        className="w-full h-[500px] bg-gray-50 rounded-xl overflow-hidden relative"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <AnimatePresence mode="wait">
           <motion.img
             key={active}
@@ -85,6 +116,7 @@ export default function Gallery({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="absolute inset-0 w-full h-full object-contain"
+            draggable={false}
           />
         </AnimatePresence>
 
@@ -119,7 +151,7 @@ export default function Gallery({
                 i === active ? "border-orange-500 scale-95" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" />
+              <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
             </button>
           ))}
         </div>

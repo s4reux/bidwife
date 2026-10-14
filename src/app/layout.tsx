@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="az">
       <body className="antialiased flex flex-col min-h-screen bg-gray-50 text-gray-900">
         <Header />
-        <VerifyBanner emailVerified={user?.emailVerified ?? false} />
+       <VerifyBanner loggedIn={!!user} emailVerified={user?.emailVerified ?? false} />
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-6 pb-24 lg:pb-6">
           {children}
         </main>
