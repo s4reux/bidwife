@@ -9,26 +9,37 @@ import { cookies } from "next/headers";
 const s = z.object({ email: z.string().email(), password: z.string() });
 
 export async function POST(req: Request) {
-  const p = s.safeParse(await req.json());
-  if (!p.success) return NextResponse.json({ error: "Yanlış məlumat" }, { status: 400 });
+  try {
+    const p = s.safeParse(await req.json());
+    if (!p.success) {
+      return NextResponse.json({ error: "Yanlış məlumat" }, { status: 400 });
+    }
 
-  const user = await prisma.user.findUnique({ where: { email: p.data.email } });
+    const user = await prisma.user.findUnique({ where: { email: p.data.email } });
 
-  if (!user || !user.password) {
+    if (!user || !user.password) {
+      return NextResponse.json({ error: "Email və ya şifrə yanlışdır" }, { status: 401 });
+    }
+
+    const valid = await verifyPassword(p.data.password, user.password);
+    if (!valid) {
+      return NextResponse.json({ error: "Email və ya şifrə yanlışdır" }, { status: 401 });
+    }
+
+    const token = await signToken({ uid: user.id, email: user.email });
+    cookies().set("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error("LOGIN ERROR:", e);
     return NextResponse.json(
-      { error: "Email və ya şifrə yanlışdır" },
-      { status: 401 }
+      { error: "Server xətası: " + (e.message || "bilinmir") },
+      { status: 500 }
     );
   }
-
-  const valid = await verifyPassword(p.data.password, user.password);
-  if (!valid) {
-    return NextResponse.json({ error: "Email və ya şifrə yanlışdır" }, { status: 401 });
-  }
-
-  const token = await signToken({ uid: user.id, email: user.email });
-  cookies().set("token", token, {
-    httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
-  });
-  return NextResponse.json({ ok: true });
 }
